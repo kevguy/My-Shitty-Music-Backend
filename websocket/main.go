@@ -1,11 +1,15 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"Redis-Exploration/websocket/util"
 
 	"github.com/gorilla/websocket"
 )
@@ -16,6 +20,18 @@ var upgrader = websocket.Upgrader{
 }
 
 func main() {
+	// Read .env
+	// then you can use for instance, os.Getenv("S3_BUCKET_NAME") to get the value
+	fEnvFile := flag.String("env-file", "", "path to environment file")
+	flag.Parse()
+
+	if *fEnvFile != "" {
+		err := util.LoadEnvFile(*fEnvFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	indexFile, err := os.Open("html/index.html")
 	if err != nil {
 		fmt.Println(err)
