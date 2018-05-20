@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script type="text/javascript">
+      function myWebSocketStart() {
+
+        const ws = new WebSocket("ws://localhost:3000/websocket");
+
+        ws.onopen = function () {
+          // Web Socket is connected, send data using send()
+          ws.send("ping")
+          const myTextArea = document.getElementById("textarea1");
+          myTextArea.value = myTextArea.value + "\n" + "First message sent";
+        }
+
+        ws.onmessage = function (evt) {
+          const myTextArea = document.getElementById("textarea1");
+          myTextArea.value = myTextArea.value + "\n" + evt.data;
+
+          if (evt.data == "pong") {
+            setTimeout(function() { ws.send("ping"); }, 2000)
+          }
+        }
+
+        ws.onclose = function () {
+          const myTextArea = document.getElementById("textarea1")
+          myTextArea.value = myTextArea.value + "\n" + "Connection Closed";
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <button
+      type="button"
+      name="button"
+      onclick="javascript:myWebSocketStart()">
+      Start websocket!
+    </button>
+    <textarea id="textarea1">MyTextArea</textarea>
+  </body>
+</html>
