@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -17,6 +18,10 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	// For different origins
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 func main() {
@@ -61,9 +66,19 @@ func main() {
 					return
 				}
 			} else {
-				conn.Close()
+				// conn.Close()
 				fmt.Println(string(msg))
-				return
+				var dat map[string]interface{}
+				if err := json.Unmarshal(msg, &dat); err != nil {
+					panic(err)
+				}
+				fmt.Println(dat)
+				err = conn.WriteMessage(msgType, []byte(msg))
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				// return
 			}
 		}
 	})

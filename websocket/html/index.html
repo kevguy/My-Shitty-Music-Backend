@@ -4,9 +4,18 @@
     <meta charset="utf-8">
     <title></title>
     <script type="text/javascript">
+      let ws;
+
+      function hihi () {
+        ws.send(JSON.stringify({
+          a: '1',
+          b: '2'
+        }))
+      }
+
       function myWebSocketStart() {
 
-        const ws = new WebSocket("ws://localhost:3000/websocket");
+        ws = new WebSocket("ws://localhost:3000/websocket");
 
         ws.onopen = function () {
           // Web Socket is connected, send data using send()
@@ -37,6 +46,12 @@
       name="button"
       onclick="javascript:myWebSocketStart()">
       Start websocket!
+    </button>
+    <button
+      type="button"
+      name="button"
+      onclick="javascript:hihi()">
+      Hihi
     </button>
     <textarea id="textarea1">MyTextArea</textarea>
   </body>
