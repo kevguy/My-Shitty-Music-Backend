@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"Redis-Exploration/websocket/api"
 	"Redis-Exploration/websocket/util"
 
 	"github.com/gorilla/mux"
@@ -23,30 +24,6 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
-}
-
-func AllSongsEndPoint(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func AllMoviesEndPoint(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "not implemented yet !")
-}
-
-func FindMovieEndpoint(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "not implemented yet !")
-}
-
-func CreateMovieEndPoint(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "not implemented yet !")
-}
-
-func UpdateMovieEndPoint(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "not implemented yet !")
-}
-
-func DeleteMovieEndPoint(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "not implemented yet !")
 }
 
 func main() {
@@ -73,7 +50,6 @@ func main() {
 
 	r := mux.NewRouter()
 
-	// http.HandleFunc("/websocket", func(w http.ResponseWriter, r *http.Request) {
 	r.HandleFunc("/websocket", func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -112,17 +88,12 @@ func main() {
 		}
 	})
 
-	r.HandleFunc("/movies", AllMoviesEndPoint).Methods("GET")
-	r.HandleFunc("/movies", CreateMovieEndPoint).Methods("POST")
-	r.HandleFunc("/movies", UpdateMovieEndPoint).Methods("PUT")
-	r.HandleFunc("/movies", DeleteMovieEndPoint).Methods("DELETE")
-	r.HandleFunc("/movies/{id}", FindMovieEndpoint).Methods("GET")
+	api.HandleApi(r)
+
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, string(index))
 	})
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		log.Fatal(err)
 	}
-
-	// http.ListenAndServe(":3000", nil)
 }
