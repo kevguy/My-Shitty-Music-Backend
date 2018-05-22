@@ -82,17 +82,20 @@ func BroadcastMsg(msg Message) error {
 func handleMessage() {
 	for {
 		// Grab the next message from the broadcast channel
-		msg := <-broadcast
-
-		if msg.Type == "text" {
+		switch msg := <-broadcast; msg.Type {
+		case "text":
 			if string(msg.Content) == "ping" {
 				msg.Content = "pong"
 				BroadcastMsg(msg)
 			} else {
 				BroadcastMsg(msg)
 			}
-		} else {
-			// Parse content (i.e. msg.Content)
+		case "upvote":
+			fmt.Println("Haven't implemented yet")
+		case "add_new_song":
+			fmt.Println("Haven't implemented yet")
+		default:
+			fmt.Println("Haven't implemented yet")
 		}
 	}
 }
@@ -104,3 +107,41 @@ func CreateWebsocket(r *mux.Router, _dao *dao.ShittyMusicDAO) {
 	// Start listening for incoming chat messages
 	go handleMessage()
 }
+
+// r.HandleFunc("/websocket", func(w http.ResponseWriter, r *http.Request) {
+// 	ws, err := upgrader.Upgrade(w, r, nil)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return
+// 	}
+// 	for {
+// 		msgType, msg, err := ws.ReadMessage()
+// 		if err != nil {
+// 			fmt.Println(err)
+// 			return
+// 		}
+// 		if string(msg) == "ping" {
+// 			fmt.Println("ping")
+// 			time.Sleep(2 * time.Second)
+// 			err = ws.WriteMessage(msgType, []byte("pong"))
+// 			if err != nil {
+// 				fmt.Println(err)
+// 				return
+// 			}
+// 		} else {
+// 			// ws.Close()
+// 			fmt.Println(string(msg))
+// 			var dat map[string]interface{}
+// 			if err := json.Unmarshal(msg, &dat); err != nil {
+// 				panic(err)
+// 			}
+// 			fmt.Println(dat)
+// 			err = ws.WriteMessage(msgType, []byte(msg))
+// 			if err != nil {
+// 				fmt.Println(err)
+// 				return
+// 			}
+// 			// return
+// 		}
+// 	}
+// })
