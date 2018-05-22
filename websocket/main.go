@@ -1,33 +1,22 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"Redis-Exploration/websocket/api"
 	"Redis-Exploration/websocket/dao"
+	"Redis-Exploration/websocket/mywebsocket"
 	"Redis-Exploration/websocket/util"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 )
 
 var shittyMusicDAO = dao.ShittyMusicDAO{}
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	// For different origins
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
 
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func initEnv() {
@@ -44,13 +33,13 @@ func initEnv() {
 		}
 	}
 
-	fmt.Println(os.Getenv("MONGOLAB_SERVER"))
-	fmt.Println(os.Getenv("MONGOLAB_DATABASE"))
-	shittyMusicDAO.Server = os.Getenv("MONGOLAB_SERVER")
-	shittyMusicDAO.Database = os.Getenv("MONGOLAB_DATABASE")
-	shittyMusicDAO.Addr = os.Getenv("MONGOLAB_ADDR")
-	shittyMusicDAO.Username = os.Getenv("MONGOLAB_USER")
-	shittyMusicDAO.Password = os.Getenv("MONGOLAB_PASSWORD")
+	shittyMusicDAO = dao.ShittyMusicDAO{
+		Server:   os.Getenv("MONGOLAB_SERVER"),
+		Database: os.Getenv("MONGOLAB_DATABASE"),
+		Addr:     os.Getenv("MONGOLAB_ADDR"),
+		Username: os.Getenv("MONGOLAB_USER"),
+		Password: os.Getenv("MONGOLAB_PASSWORD"),
+	}
 
 	shittyMusicDAO.Connect()
 }
@@ -69,43 +58,7 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/websocket", func(w http.ResponseWriter, r *http.Request) {
-		conn, err := upgrader.Upgrade(w, r, nil)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		for {
-			msgType, msg, err := conn.ReadMessage()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			if string(msg) == "ping" {
-				fmt.Println("ping")
-				time.Sleep(2 * time.Second)
-				err = conn.WriteMessage(msgType, []byte("pong"))
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-			} else {
-				// conn.Close()
-				fmt.Println(string(msg))
-				var dat map[string]interface{}
-				if err := json.Unmarshal(msg, &dat); err != nil {
-					panic(err)
-				}
-				fmt.Println(dat)
-				err = conn.WriteMessage(msgType, []byte(msg))
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				// return
-			}
-		}
-	})
+	mywebsocket.CreateWebsocket(r, &shittyMusicDAO)
 
 	api.HandleApi(r, &shittyMusicDAO)
 

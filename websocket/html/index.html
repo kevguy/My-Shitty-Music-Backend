@@ -7,19 +7,25 @@
       let ws;
 
       function hihi () {
+        // ws.send(JSON.stringify({
+        //   a: '1',
+        //   b: '2'
+        // }))
         ws.send(JSON.stringify({
-          a: '1',
-          b: '2'
+          type: "text",
+          content: "wahahahahahahahaha"
         }))
       }
 
       function myWebSocketStart() {
-
         ws = new WebSocket("ws://localhost:3000/websocket");
 
         ws.onopen = function () {
           // Web Socket is connected, send data using send()
-          ws.send("ping")
+          ws.send(JSON.stringify({
+            type: "text",
+            content: "ping"
+          }))
           const myTextArea = document.getElementById("textarea1");
           myTextArea.value = myTextArea.value + "\n" + "First message sent";
         }

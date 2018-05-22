@@ -23,12 +23,3 @@ type Song struct {
 	YouTubeID   string        `bson:"youtube_id" json:"youtube_id"`
 	Upvotes     int           `bson:"upvotes" json:"upvotes"`
 }
-
-// Movie Represents a movie, we uses bson keyword to tell the mgo driver how to name
-// the properties in mongodb document
-type Movie struct {
-	ID          bson.ObjectId `bson:"_id" json:"id"`
-	Name        string        `bson:"name" json:"name"`
-	CoverImage  string        `bson:"cover_image" json:"cover_image"`
-	Description string        `bson:"description" json:"description"`
-}
