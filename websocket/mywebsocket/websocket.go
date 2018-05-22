@@ -65,7 +65,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func broadcastMsg(msg Message) error {
+func BroadcastMsg(msg Message) error {
 	// Send it out to every client that is currently connected
 	for client := range clients {
 		err := client.WriteJSON(msg)
@@ -87,9 +87,9 @@ func handleMessage() {
 		if msg.Type == "text" {
 			if string(msg.Content) == "ping" {
 				msg.Content = "pong"
-				broadcastMsg(msg)
+				BroadcastMsg(msg)
 			} else {
-				broadcastMsg(msg)
+				BroadcastMsg(msg)
 			}
 		} else {
 			// Parse content (i.e. msg.Content)
@@ -103,82 +103,4 @@ func CreateWebsocket(r *mux.Router, _dao *dao.ShittyMusicDAO) {
 
 	// Start listening for incoming chat messages
 	go handleMessage()
-
-	// r.HandleFunc("/websocket", func(w http.ResponseWriter, r *http.Request) {
-	// 	ws, err := upgrader.Upgrade(w, r, nil)
-	// 	if err != nil {
-	// 		fmt.Printf("creating websocket: %s\n", err)
-	// 		log.Fatalf("creating websocket: %s\n", err)
-	// 		return
-	// 	}
-	//
-	// 	for {
-	// 		msgType, msg, err := ws.ReadMessage()
-	// 		if err != nil {
-	// 			fmt.Printf("message error: %s\n", err)
-	// 			// return
-	// 		}
-	//
-	// 		// Handle Ping Message
-	// 		fmt.Println(string(msg))
-	// 		fmt.Println(util.IsJSON(string(msg)))
-	// 		if string(msg) == "ping" {
-	// 			err = pingpong(ws, msgType)
-	// 			if err != nil {
-	// 				fmt.Printf("ping message error: %s\n", err)
-	// 				// return
-	// 			}
-	// 		} else if util.IsJSON(string(msg)) {
-	// 			var data map[string]interface{}
-	// 			if err = json.Unmarshal(msg, &data); err != nil {
-	// 				fmt.Printf("parsing JSON string: %s\n", err)
-	// 				// return
-	// 			}
-	//
-	// 			fmt.Println(data)
-	// 			fmt.Println(data["a"])
-	// 			if err = ws.WriteMessage(msgType, []byte(msg)); err != nil {
-	// 				fmt.Printf("sending ws reply: %s\n", err)
-	// 			}
-	// 		}
-	// 	}
-	// })
 }
-
-// r.HandleFunc("/websocket", func(w http.ResponseWriter, r *http.Request) {
-// 	ws, err := upgrader.Upgrade(w, r, nil)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return
-// 	}
-// 	for {
-// 		msgType, msg, err := ws.ReadMessage()
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return
-// 		}
-// 		if string(msg) == "ping" {
-// 			fmt.Println("ping")
-// 			time.Sleep(2 * time.Second)
-// 			err = ws.WriteMessage(msgType, []byte("pong"))
-// 			if err != nil {
-// 				fmt.Println(err)
-// 				return
-// 			}
-// 		} else {
-// 			// ws.Close()
-// 			fmt.Println(string(msg))
-// 			var dat map[string]interface{}
-// 			if err := json.Unmarshal(msg, &dat); err != nil {
-// 				panic(err)
-// 			}
-// 			fmt.Println(dat)
-// 			err = ws.WriteMessage(msgType, []byte(msg))
-// 			if err != nil {
-// 				fmt.Println(err)
-// 				return
-// 			}
-// 			// return
-// 		}
-// 	}
-// })

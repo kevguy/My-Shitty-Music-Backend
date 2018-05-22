@@ -7,6 +7,7 @@ import (
 
 	"Redis-Exploration/websocket/dao"
 	. "Redis-Exploration/websocket/models"
+	"Redis-Exploration/websocket/mywebsocket"
 	"Redis-Exploration/websocket/util"
 
 	"github.com/gorilla/mux"
@@ -23,6 +24,10 @@ func AllSongsEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.RespondWithJSON(w, http.StatusOK, songs)
+	mywebsocket.BroadcastMsg(mywebsocket.Message{
+		Type:    "text",
+		Content: "AllSongsEndPoint",
+	})
 }
 
 // FindSongEndpoint finds a song
@@ -34,6 +39,10 @@ func FindSongEndpoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.RespondWithJSON(w, http.StatusOK, song)
+	mywebsocket.BroadcastMsg(mywebsocket.Message{
+		Type:    "text",
+		Content: "FindSongEndpoint",
+	})
 }
 
 func CreateSongEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -51,6 +60,10 @@ func CreateSongEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.RespondWithJSON(w, http.StatusCreated, song)
+	mywebsocket.BroadcastMsg(mywebsocket.Message{
+		Type:    "text",
+		Content: "CreateSongEndPoint",
+	})
 }
 
 func UpdateSongEndPoint(w http.ResponseWriter, r *http.Request) {
