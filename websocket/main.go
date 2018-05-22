@@ -11,11 +11,14 @@ import (
 	"time"
 
 	"Redis-Exploration/websocket/api"
+	"Redis-Exploration/websocket/dao"
 	"Redis-Exploration/websocket/util"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
+
+var shittyMusicDAO = dao.ShittyMusicDAO{}
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -26,7 +29,9 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func main() {
+// Parse the configuration file 'config.toml', and establish a connection to DB
+func initEnv() {
+	fmt.Println("initEnv")
 	// Read .env
 	// then you can use for instance, os.Getenv("S3_BUCKET_NAME") to get the value
 	fEnvFile := flag.String("env-file", "", "path to environment file")
@@ -38,6 +43,20 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+
+	fmt.Println(os.Getenv("MONGOLAB_SERVER"))
+	fmt.Println(os.Getenv("MONGOLAB_DATABASE"))
+	shittyMusicDAO.Server = os.Getenv("MONGOLAB_SERVER")
+	shittyMusicDAO.Database = os.Getenv("MONGOLAB_DATABASE")
+	shittyMusicDAO.Addr = os.Getenv("MONGOLAB_ADDR")
+	shittyMusicDAO.Username = os.Getenv("MONGOLAB_USER")
+	shittyMusicDAO.Password = os.Getenv("MONGOLAB_PASSWORD")
+
+	shittyMusicDAO.Connect()
+}
+
+func main() {
+	initEnv()
 
 	indexFile, err := os.Open("html/index.html")
 	if err != nil {
@@ -88,7 +107,7 @@ func main() {
 		}
 	})
 
-	api.HandleApi(r)
+	api.HandleApi(r, &shittyMusicDAO)
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, string(index))
