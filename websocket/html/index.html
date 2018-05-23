@@ -44,6 +44,24 @@
           myTextArea.value = myTextArea.value + "\n" + "Connection Closed";
         }
       }
+
+      // var myHeaders = new Headers();
+      //
+      // var myInit = { method: 'GET',
+      //                headers: myHeaders,
+      //                mode: 'cors',
+      //                cache: 'default' };
+      //
+      // var myRequest = new Request('flowers.jpg', myInit);
+
+      fetch("http://localhost:3000/googleauth/loginurl", {
+          method: 'GET',
+          mode: 'cors',
+        })
+        .then(res => res.json())
+        .then((result) => {
+          console.log(result)
+        })
     </script>
   </head>
   <body>
@@ -59,6 +77,10 @@
       onclick="javascript:hihi()">
       Hihi
     </button>
+    <button
+      type="button"
+      name="button"
+      >Login Google</button>
     <textarea id="textarea1">MyTextArea</textarea>
   </body>
 </html>

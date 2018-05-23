@@ -10,13 +10,18 @@ import (
 
 	"Redis-Exploration/websocket/api"
 	"Redis-Exploration/websocket/dao"
+	"Redis-Exploration/websocket/googleauth"
 	"Redis-Exploration/websocket/mywebsocket"
 	"Redis-Exploration/websocket/util"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 )
 
 var shittyMusicDAO = dao.ShittyMusicDAO{}
+var googleCredientials = googleauth.Credentials{}
+
+var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func initEnv() {
@@ -42,6 +47,11 @@ func initEnv() {
 	}
 
 	shittyMusicDAO.Connect()
+
+	googleCredientials = googleauth.Credentials{
+		Cid:     os.Getenv("GOOGLE_AUTH_CLIENT_ID"),
+		Csecret: os.Getenv("GOOGLE_AUTH_CLIENT_SECRET"),
+	}
 }
 
 func main() {
@@ -59,6 +69,8 @@ func main() {
 	r := mux.NewRouter()
 
 	mywebsocket.CreateWebsocket(r, &shittyMusicDAO)
+
+	googleauth.CreateRoutes(googleCredientials, r, store, &shittyMusicDAO)
 
 	api.HandleApi(r, &shittyMusicDAO)
 

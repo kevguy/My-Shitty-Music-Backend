@@ -4,3 +4,8 @@ go run main.go -env-file=../.env
 
 https://scotch.io/bar-talk/build-a-realtime-chat-server-with-go-and-websockets
 https://github.com/scotch-io/go-realtime-chat/blob/master/public/app.js
+
+
+OAuth2
+https://skarlso.github.io/2016/06/12/google-signin-with-go/
+https://skarlso.github.io/2016/11/02/google-signin-with-go-part2/
