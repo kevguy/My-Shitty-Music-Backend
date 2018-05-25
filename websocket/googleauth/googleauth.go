@@ -5,6 +5,7 @@ import (
 	"Redis-Exploration/websocket/util"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/gob"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -27,6 +28,17 @@ type Credentials struct {
 	Csecret string `json:"csecret"`
 }
 
+const (
+	defaultSessionID = "default"
+	// The following keys are used for the default session. For example:
+	googleProfileSessionKey = "google_profile"
+	oauthTokenSessionKey    = "oauth_token"
+
+	// This key is used in the OAuth flow session to store the URL to redirect the
+	// user to after the OAuth flow is complete.
+	oauthFlowRedirectKey = "redirect"
+)
+
 func randToken() string {
 	b := make([]byte, 32)
 	rand.Read(b)
@@ -34,6 +46,10 @@ func randToken() string {
 }
 
 func initGoogleAuth(c Credentials) {
+	// Gob encoding for gorilla/sessions
+	gob.Register(&oauth2.Token{})
+	gob.Register(&Profile{})
+
 	conf = &oauth2.Config{
 		ClientID:     c.Cid,
 		ClientSecret: c.Csecret,
@@ -151,6 +167,19 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 	//   data, _ := ioutil.ReadAll(email.Body)
 	//   log.Println("Email body: ", string(data))
 	//   c.Status(http.StatusOK)
+
+	// Sample Email body
+	// 	Email body:  {
+	//  "sub": "105524006654987809707",
+	//  "name": "Kev Lai",
+	//  "given_name": "Kev",
+	//  "family_name": "Lai",
+	//  "profile": "https://plus.google.com/105524006654987809707",
+	//  "picture": "https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg",
+	//  "email": "kevatuk@gmail.com",
+	//  "email_verified": true
+	// }
+
 }
 
 func CreateRoutes(c Credentials, r *mux.Router, cookieStore *sessions.CookieStore, _dao *dao.ShittyMusicDAO) {
@@ -159,4 +188,8 @@ func CreateRoutes(c Credentials, r *mux.Router, cookieStore *sessions.CookieStor
 
 	r.HandleFunc("/googleauth/loginurl", getLoginURL).Methods("GET", "OPTIONS")
 	r.HandleFunc("/googleauth/auth", authHandler).Methods("GET")
+}
+
+type Profile struct {
+	ID, DisplayName, FullName, ImageURL, Email string
 }

@@ -22,4 +22,5 @@ type Song struct {
 	URL         string        `bson:"url" json:"url"`
 	YouTubeID   string        `bson:"youtube_id" json:"youtube_id"`
 	Upvotes     int           `bson:"upvotes" json:"upvotes"`
+	Plays       int           `bson:"plays" json:"plays"`
 }

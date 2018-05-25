@@ -55,6 +55,7 @@ func CreateSongEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 	song.ID = bson.NewObjectId()
 	song.Upvotes = 0
+	song.Plays = 0
 	if err := shittyMusicDao.InsertSong(song); err != nil {
 		util.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
