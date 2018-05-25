@@ -5,6 +5,7 @@ import (
 	"Redis-Exploration/websocket/util"
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -46,6 +47,8 @@ func initGoogleAuth(c Credentials) {
 
 // AllSongsEndPoint finds all songs
 func getLoginURL(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("I got you babe")
+	fmt.Println(r.FormValue("redirect"))
 	state = randToken()
 
 	// Get a session. Get() always returns a session, even if empty.
@@ -65,9 +68,10 @@ func getLoginURL(w http.ResponseWriter, r *http.Request) {
 
 	// State can be some kind of random generated hash string.
 	// See relevant RFC: http://tools.ietf.org/html/rfc6749#section-10.12
-	loginUrl := conf.AuthCodeURL(state)
+	fmt.Println("hihi")
+	loginURL := conf.AuthCodeURL(state)
 
-	util.RespondWithJSON(w, http.StatusOK, loginUrl)
+	util.RespondWithJSON(w, http.StatusOK, loginURL)
 
 	// songs, err := shittyMusicDao.FindAllSongs()
 	// if err != nil {
@@ -83,6 +87,7 @@ func getLoginURL(w http.ResponseWriter, r *http.Request) {
 
 func authHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("handling Login")
+
 	// Handle the exchange code to initiate a transport.
 	session, err := store.Get(r, "session-name")
 	// if err != nil {
@@ -152,6 +157,6 @@ func CreateRoutes(c Credentials, r *mux.Router, cookieStore *sessions.CookieStor
 	store = cookieStore
 	initGoogleAuth(c)
 
-	r.HandleFunc("/googleauth/loginurl", getLoginURL).Methods("GET")
+	r.HandleFunc("/googleauth/loginurl", getLoginURL).Methods("GET", "OPTIONS")
 	r.HandleFunc("/googleauth/auth", authHandler).Methods("GET")
 }
