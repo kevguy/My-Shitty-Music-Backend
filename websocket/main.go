@@ -12,6 +12,7 @@ import (
 	"Redis-Exploration/websocket/dao"
 	"Redis-Exploration/websocket/googleauth"
 	"Redis-Exploration/websocket/mywebsocket"
+	"Redis-Exploration/websocket/redis"
 	"Redis-Exploration/websocket/util"
 
 	"github.com/gorilla/mux"
@@ -19,6 +20,7 @@ import (
 
 var shittyMusicDAO = dao.ShittyMusicDAO{}
 var googleCredientials = googleauth.Credentials{}
+var shittyMusicRedisDAO = redisclient.ShittyMusicRedisDAO{}
 
 // var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
@@ -52,6 +54,16 @@ func initEnv() {
 		Csecret: os.Getenv("GOOGLE_AUTH_CLIENT_SECRET"),
 	}
 
+	shittyMusicRedisDAO = redisclient.ShittyMusicRedisDAO{
+		Addr:     os.Getenv("REDIS_URI") + ":" + os.Getenv("REDIS_PORT"),
+		Password: "",
+		DB:       0,
+	}
+	shittyMusicRedisDAO.Connect()
+
+	// REDIS_URI=redis-18736.c14.us-east-1-3.ec2.cloud.redislabs.com
+	// REDIS_PORT=18736
+
 	// store.Options = &sessions.Options{
 	// 	// Domain:   "localhost",
 	// 	// Path:     "/",
@@ -74,11 +86,11 @@ func main() {
 
 	r := mux.NewRouter()
 
-	mywebsocket.CreateWebsocket(r, &shittyMusicDAO)
+	mywebsocket.CreateWebsocket(r, &shittyMusicDAO, &shittyMusicRedisDAO)
 
 	googleauth.CreateRoutes(googleCredientials, r, &shittyMusicDAO)
 
-	api.HandleApi(r, &shittyMusicDAO)
+	api.HandleApi(r, &shittyMusicDAO, &shittyMusicRedisDAO)
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, string(index))

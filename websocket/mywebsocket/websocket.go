@@ -2,6 +2,7 @@ package mywebsocket
 
 import (
 	"Redis-Exploration/websocket/dao"
+	"Redis-Exploration/websocket/redis"
 	"fmt"
 	"log"
 	"net/http"
@@ -21,6 +22,7 @@ var clients = make(map[*websocket.Conn]bool) // connected clients
 var broadcast = make(chan Message)           // broadcast channel
 
 var shittyMusicDao dao.ShittyMusicDAO
+var shittyMusicRedisDao redisclient.ShittyMusicRedisDAO
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -93,7 +95,8 @@ func handleMessage() {
 				BroadcastMsg(msg)
 			}
 		case "play":
-			fmt.Println("Haven't implemented yet")
+			fmt.Println("got play")
+			handlePlay(msg.Content)
 		case "upvote":
 			handleUpvote(msg.Content)
 		case "add_new_song":
@@ -104,9 +107,9 @@ func handleMessage() {
 	}
 }
 
-func handleUpvote(songId string) {
+func handleUpvote(songID string) {
 	// Find song
-	song, err := shittyMusicDao.FindSongByID(songId)
+	song, err := shittyMusicDao.FindSongByID(songID)
 	if err != nil {
 		// can't find song
 		return
@@ -121,15 +124,22 @@ func handleUpvote(songId string) {
 
 	msg := Message{
 		Type:    "upvote",
-		Content: songId + ":" + string(song.Upvotes),
+		Content: songID + ":" + string(song.Upvotes),
 	}
 
 	BroadcastMsg(msg)
 }
 
-func handlePlay(songId string) {
+func handlePlay(songID string) {
+	if err := shittyMusicRedisDao.PlaySong(songID); err != nil {
+		if err != nil {
+			// can't find song
+			return
+		}
+	}
+
 	// Find song
-	song, err := shittyMusicDao.FindSongByID(songId)
+	song, err := shittyMusicDao.FindSongByID(songID)
 	if err != nil {
 		// can't find song
 		return
@@ -144,14 +154,15 @@ func handlePlay(songId string) {
 
 	msg := Message{
 		Type:    "play",
-		Content: songId + ":" + string(song.Plays),
+		Content: songID + ":" + string(song.Plays),
 	}
 
 	BroadcastMsg(msg)
 }
 
-func CreateWebsocket(r *mux.Router, _dao *dao.ShittyMusicDAO) {
+func CreateWebsocket(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *redisclient.ShittyMusicRedisDAO) {
 	shittyMusicDao = *_dao
+	shittyMusicRedisDao = *_redisDao
 
 	// Configure websocket route
 	r.HandleFunc("/websocket", handleConnections)

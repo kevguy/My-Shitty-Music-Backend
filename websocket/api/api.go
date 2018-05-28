@@ -8,6 +8,7 @@ import (
 	"Redis-Exploration/websocket/dao"
 	. "Redis-Exploration/websocket/models"
 	"Redis-Exploration/websocket/mywebsocket"
+	"Redis-Exploration/websocket/redis"
 	"Redis-Exploration/websocket/util"
 
 	"github.com/gorilla/mux"
@@ -15,6 +16,7 @@ import (
 )
 
 var shittyMusicDao dao.ShittyMusicDAO
+var shittyMusicRedisDao redisclient.ShittyMusicRedisDAO
 
 // AllSongsEndPoint finds all songs
 func AllSongsEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -63,6 +65,12 @@ func CreateSongEndPoint(w http.ResponseWriter, r *http.Request) {
 		util.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	if err := shittyMusicRedisDao.InitSong(string(song.ID), 0, 0); err != nil {
+		util.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	util.RespondWithJSON(w, http.StatusCreated, song)
 	mywebsocket.BroadcastMsg(mywebsocket.Message{
 		Type:    "text",
@@ -98,13 +106,33 @@ func DeleteSongEndPoint(w http.ResponseWriter, r *http.Request) {
 	util.RespondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-func HandleApi(r *mux.Router, _dao *dao.ShittyMusicDAO) {
+func GetSongsPlaysEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	vals, err := shittyMusicRedisDao.GetPlays()
+	if err != nil {
+		util.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	b, err := json.Marshal(vals)
+	if err != nil {
+		util.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	util.RespondWithJSON(w, http.StatusOK, string(b))
+}
+
+func HandleApi(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *redisclient.ShittyMusicRedisDAO) {
 	fmt.Println("HandleApi")
 	shittyMusicDao = *_dao
+	shittyMusicRedisDao = *_redisDao
 
+	r.HandleFunc("/songs/plays", GetSongsPlaysEndPoint).Methods("GET")
 	r.HandleFunc("/songs", AllSongsEndPoint).Methods("GET")
 	r.HandleFunc("/songs", CreateSongEndPoint).Methods("POST", "OPTIONS")
 	r.HandleFunc("/songs", UpdateSongEndPoint).Methods("PUT", "OPTIONS")
 	r.HandleFunc("/songs", DeleteSongEndPoint).Methods("DELETE", "OPTIONS")
 	r.HandleFunc("/songs/{id}", FindSongEndpoint).Methods("GET")
+
 }
