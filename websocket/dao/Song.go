@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// ShittyMusicDAO contains info needed to set up communication with MongoDB
 type ShittyMusicDAO struct {
 	Server   string
 	Database string
@@ -20,19 +22,12 @@ type ShittyMusicDAO struct {
 
 var db *mgo.Database
 
+// The collection name
 const (
 	COLLECTION = "songs"
 )
 
 // Connect establishes a connection to database
-// func (m *ShittyMusicDAO) Connect() {
-// 	session, err := mgo.Dial(m.Server)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	db = session.DB(m.Database)
-// }
-
 func (m *ShittyMusicDAO) Connect() {
 	mongoDBDialInfo := &mgo.DialInfo{
 		Addrs:    []string{m.Addr},
@@ -50,6 +45,8 @@ func (m *ShittyMusicDAO) Connect() {
 	}
 
 	db = mongoSession.DB(m.Database)
+
+	fmt.Println("Connected to MongoDB")
 
 	// Reads may not be entirely up-to-date, but they will always see the
 	// history of changes moving forward, the data read will be consistent
@@ -81,7 +78,7 @@ func (m *ShittyMusicDAO) FindAllSongs() ([]Song, error) {
 	return songs, err
 }
 
-// FindSongByID finds song by Id
+// FindSongByID finds song by ID
 func (m *ShittyMusicDAO) FindSongByID(id string) (Song, error) {
 	var song Song
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&song)

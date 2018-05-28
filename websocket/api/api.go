@@ -47,6 +47,7 @@ func FindSongEndpoint(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// CreateSongEndPoint saves a new song
 func CreateSongEndPoint(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("CreateSongEndPoint")
 	defer r.Body.Close()
@@ -78,6 +79,7 @@ func CreateSongEndPoint(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// UpdateSongEndPoint updates the information of a song
 func UpdateSongEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var song Song
@@ -92,6 +94,7 @@ func UpdateSongEndPoint(w http.ResponseWriter, r *http.Request) {
 	util.RespondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+// DeleteSongEndPoint deletes a song
 func DeleteSongEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var song Song
@@ -106,6 +109,7 @@ func DeleteSongEndPoint(w http.ResponseWriter, r *http.Request) {
 	util.RespondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+// GetSongsPlaysEndPoint retrieves the number of plays for every song (from Redis)
 func GetSongsPlaysEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	vals, err := shittyMusicRedisDao.GetPlays()
@@ -113,18 +117,12 @@ func GetSongsPlaysEndPoint(w http.ResponseWriter, r *http.Request) {
 		util.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	b, err := json.Marshal(vals)
-	if err != nil {
-		util.RespondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	util.RespondWithJSON(w, http.StatusOK, string(b))
+	util.RespondWithJSON(w, http.StatusOK, vals)
 }
 
-func HandleApi(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *redisclient.ShittyMusicRedisDAO) {
-	fmt.Println("HandleApi")
+// HandleAPI sets up how to handle API calls
+func HandleAPI(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *redisclient.ShittyMusicRedisDAO) {
+	fmt.Println("Setting up Api Calls")
 	shittyMusicDao = *_dao
 	shittyMusicRedisDao = *_redisDao
 

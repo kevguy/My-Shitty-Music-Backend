@@ -160,7 +160,9 @@ func handlePlay(songID string) {
 	BroadcastMsg(msg)
 }
 
+// CreateWebsocket sets up the websocket
 func CreateWebsocket(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *redisclient.ShittyMusicRedisDAO) {
+	fmt.Println("Setting up Websocket")
 	shittyMusicDao = *_dao
 	shittyMusicRedisDao = *_redisDao
 

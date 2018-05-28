@@ -39,6 +39,7 @@ func initEnv() {
 		}
 	}
 
+	// Init MongoDB's Song DAO
 	shittyMusicDAO = dao.ShittyMusicDAO{
 		Server:   os.Getenv("MONGOLAB_SERVER"),
 		Database: os.Getenv("MONGOLAB_DATABASE"),
@@ -46,7 +47,6 @@ func initEnv() {
 		Username: os.Getenv("MONGOLAB_USER"),
 		Password: os.Getenv("MONGOLAB_PASSWORD"),
 	}
-
 	shittyMusicDAO.Connect()
 
 	googleCredientials = googleauth.Credentials{
@@ -54,15 +54,13 @@ func initEnv() {
 		Csecret: os.Getenv("GOOGLE_AUTH_CLIENT_SECRET"),
 	}
 
+	// Init Redis's DAO
 	shittyMusicRedisDAO = redisclient.ShittyMusicRedisDAO{
 		Addr:     os.Getenv("REDIS_URI") + ":" + os.Getenv("REDIS_PORT"),
 		Password: "",
 		DB:       0,
 	}
 	shittyMusicRedisDAO.Connect()
-
-	// REDIS_URI=redis-18736.c14.us-east-1-3.ec2.cloud.redislabs.com
-	// REDIS_PORT=18736
 
 	// store.Options = &sessions.Options{
 	// 	// Domain:   "localhost",
@@ -75,6 +73,17 @@ func initEnv() {
 func main() {
 	initEnv()
 
+	r := mux.NewRouter()
+
+	// Setup websocket
+	mywebsocket.CreateWebsocket(r, &shittyMusicDAO, &shittyMusicRedisDAO)
+
+	googleauth.CreateRoutes(googleCredientials, r, &shittyMusicDAO)
+
+	// Setup API Calls
+	api.HandleAPI(r, &shittyMusicDAO, &shittyMusicRedisDAO)
+
+	// Serves index html page
 	indexFile, err := os.Open("html/index.html")
 	if err != nil {
 		fmt.Println(err)
@@ -83,15 +92,6 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	r := mux.NewRouter()
-
-	mywebsocket.CreateWebsocket(r, &shittyMusicDAO, &shittyMusicRedisDAO)
-
-	googleauth.CreateRoutes(googleCredientials, r, &shittyMusicDAO)
-
-	api.HandleApi(r, &shittyMusicDAO, &shittyMusicRedisDAO)
-
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, string(index))
 	})

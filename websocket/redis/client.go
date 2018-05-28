@@ -26,8 +26,8 @@ type Plays struct {
 	Plays  int
 }
 
+// Connect creates a connection to Redis
 func (c *ShittyMusicRedisDAO) Connect() {
-	fmt.Println("connecting to redis client")
 	client = redis.NewClient(&redis.Options{
 		Addr:     c.Addr,
 		Password: c.Password, // no password set
@@ -40,26 +40,25 @@ func (c *ShittyMusicRedisDAO) Connect() {
 	}
 	fmt.Println(pong, err)
 	// Output: PONG <nil>
+	fmt.Println("Connected to Redis")
 }
 
+// InitSong saves a new song into Redis using the keys
+// song:song_id:plays and song:song_id:upvotes
 func (c *ShittyMusicRedisDAO) InitSong(id string, plays int, upvotes int) error {
 	// err := client.Set("key", "value", 0).Err()
-	err := client.Set("song:"+id+":plays", plays, 0).Err()
-	if err != nil {
+	if err := client.Set("song:"+id+":plays", plays, 0).Err(); err != nil {
 		panic(err)
 	}
-	err = client.Set("song:"+id+":upvotes", upvotes, 0).Err()
-	if err != nil {
+	if err := client.Set("song:"+id+":upvotes", upvotes, 0).Err(); err != nil {
 		panic(err)
 	}
-	return err
+	return nil
 }
 
+// PlaySong increases the counts of number of plays for a song
 func (c *ShittyMusicRedisDAO) PlaySong(id string) error {
 	key := "song:" + id + ":plays"
-	fmt.Println(key)
-
-	fmt.Println(client)
 
 	val, err := client.Exists(key).Result()
 	if err != nil {
@@ -82,9 +81,9 @@ func (c *ShittyMusicRedisDAO) PlaySong(id string) error {
 	}
 
 	return err
-	// return nil
 }
 
+// GetPlays gets the number of plays for all of the songs
 func (c *ShittyMusicRedisDAO) GetPlays() ([]Plays, error) {
 	keys, _, err := client.Scan(0, "song:*:plays", 1000).Result()
 	if err != nil {
@@ -114,6 +113,7 @@ func (c *ShittyMusicRedisDAO) GetPlays() ([]Plays, error) {
 	return result, err
 }
 
+// UpvoteSong increases the counts of number of upvotes for a song
 func (c *ShittyMusicRedisDAO) UpvoteSong(id string) error {
 	key := "song:" + id + ":upvotes"
 	err := client.Incr(key).Err()
@@ -145,16 +145,4 @@ func ExampleClient() {
 	}
 	// Output: key value
 	// key2 does not exist
-}
-
-func CreateRedistClient() {
-	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-
-	pong, err := client.Ping().Result()
-	fmt.Println(pong, err)
-	// Output: PONG <nil>
 }
