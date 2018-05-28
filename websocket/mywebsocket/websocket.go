@@ -20,6 +20,8 @@ type Message struct {
 var clients = make(map[*websocket.Conn]bool) // connected clients
 var broadcast = make(chan Message)           // broadcast channel
 
+var shittyMusicDao dao.ShittyMusicDAO
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -90,8 +92,10 @@ func handleMessage() {
 			} else {
 				BroadcastMsg(msg)
 			}
-		case "upvote":
+		case "play":
 			fmt.Println("Haven't implemented yet")
+		case "upvote":
+			handleUpvote(msg.Content)
 		case "add_new_song":
 			fmt.Println("Haven't implemented yet")
 		default:
@@ -100,7 +104,55 @@ func handleMessage() {
 	}
 }
 
+func handleUpvote(songId string) {
+	// Find song
+	song, err := shittyMusicDao.FindSongByID(songId)
+	if err != nil {
+		// can't find song
+		return
+	}
+
+	// Update song
+	song.Upvotes++
+	if err := shittyMusicDao.UpdateSong(song); err != nil {
+		// can't update database
+		return
+	}
+
+	msg := Message{
+		Type:    "upvote",
+		Content: songId + ":" + string(song.Upvotes),
+	}
+
+	BroadcastMsg(msg)
+}
+
+func handlePlay(songId string) {
+	// Find song
+	song, err := shittyMusicDao.FindSongByID(songId)
+	if err != nil {
+		// can't find song
+		return
+	}
+
+	// Update song
+	song.Plays++
+	if err := shittyMusicDao.UpdateSong(song); err != nil {
+		// can't update database
+		return
+	}
+
+	msg := Message{
+		Type:    "play",
+		Content: songId + ":" + string(song.Plays),
+	}
+
+	BroadcastMsg(msg)
+}
+
 func CreateWebsocket(r *mux.Router, _dao *dao.ShittyMusicDAO) {
+	shittyMusicDao = *_dao
+
 	// Configure websocket route
 	r.HandleFunc("/websocket", handleConnections)
 

@@ -49,6 +49,7 @@ func CreateSongEndPoint(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("CreateSongEndPoint")
 	defer r.Body.Close()
 	var song Song
+	fmt.Println(song.Name)
 	if err := json.NewDecoder(r.Body).Decode(&song); err != nil {
 		util.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
@@ -56,6 +57,8 @@ func CreateSongEndPoint(w http.ResponseWriter, r *http.Request) {
 	song.ID = bson.NewObjectId()
 	song.Upvotes = 0
 	song.Plays = 0
+	fmt.Println("Trying to insert song")
+	fmt.Println(song.Name)
 	if err := shittyMusicDao.InsertSong(song); err != nil {
 		util.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -100,8 +103,8 @@ func HandleApi(r *mux.Router, _dao *dao.ShittyMusicDAO) {
 	shittyMusicDao = *_dao
 
 	r.HandleFunc("/songs", AllSongsEndPoint).Methods("GET")
-	r.HandleFunc("/songs", CreateSongEndPoint).Methods("POST")
-	r.HandleFunc("/songs", UpdateSongEndPoint).Methods("PUT")
-	r.HandleFunc("/songs", DeleteSongEndPoint).Methods("DELETE")
+	r.HandleFunc("/songs", CreateSongEndPoint).Methods("POST", "OPTIONS")
+	r.HandleFunc("/songs", UpdateSongEndPoint).Methods("PUT", "OPTIONS")
+	r.HandleFunc("/songs", DeleteSongEndPoint).Methods("DELETE", "OPTIONS")
 	r.HandleFunc("/songs/{id}", FindSongEndpoint).Methods("GET")
 }
