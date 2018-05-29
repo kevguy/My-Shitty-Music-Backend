@@ -24,7 +24,8 @@ var db *mgo.Database
 
 // The collection name
 const (
-	COLLECTION = "songs"
+	COLLECTION      = "songs"
+	USER_COLLECTION = "users"
 )
 
 // Connect establishes a connection to database
@@ -101,4 +102,32 @@ func (m *ShittyMusicDAO) DeleteSong(song Song) error {
 func (m *ShittyMusicDAO) UpdateSong(song Song) error {
 	err := db.C(COLLECTION).UpdateId(song.ID, &song)
 	return err
+}
+
+// InsertGoogleUser saves a new Google user
+func (m *ShittyMusicDAO) InsertGoogleUser(profile GoogleProfile) error {
+	user := User{
+		ID:          bson.NewObjectId(),
+		GoogleID:    profile.ID,
+		Type:        "google",
+		Name:        profile.FullName,
+		DisplayName: profile.DisplayName,
+		ProfilePic:  profile.ImageURL,
+		Email:       profile.Email,
+	}
+	err := db.C(USER_COLLECTION).Insert(&user)
+	return err
+}
+
+// FindGoogleUser finds a user that logs in using Google
+func (m *ShittyMusicDAO) FindGoogleUser(googleID string) (User, error) {
+	// var users []User
+	// err := db.C(USER_COLLECTION).Find(bson.M{"type": "google", "google_id": googleID}).All(&users)
+	// if len(users) == 0 {
+	// 	return users, err
+	// }
+	// return users[0], err
+	var user User
+	err := db.C(USER_COLLECTION).Find(bson.M{"type": "google", "google_id": googleID}).One(&user)
+	return user, err
 }

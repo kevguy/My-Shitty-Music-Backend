@@ -67,7 +67,7 @@ func CreateSongEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := shittyMusicRedisDao.InitSong(string(song.ID), 0, 0); err != nil {
+	if err := shittyMusicRedisDao.InitSong(song.ID.String(), 0, 0); err != nil {
 		util.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

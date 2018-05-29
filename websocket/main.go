@@ -79,6 +79,7 @@ func main() {
 	mywebsocket.CreateWebsocket(r, &shittyMusicDAO, &shittyMusicRedisDAO)
 
 	googleauth.CreateRoutes(googleCredientials, r, &shittyMusicDAO)
+	googleauth.CreateAuthenticationRoutes(r, &shittyMusicDAO, &shittyMusicRedisDAO)
 
 	// Setup API Calls
 	api.HandleAPI(r, &shittyMusicDAO, &shittyMusicRedisDAO)

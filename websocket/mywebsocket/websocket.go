@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -152,9 +153,10 @@ func handlePlay(songID string) {
 		return
 	}
 
+	str := strconv.Itoa(song.Plays)
 	msg := Message{
 		Type:    "play",
-		Content: songID + ":" + string(song.Plays),
+		Content: songID + ":" + str,
 	}
 
 	BroadcastMsg(msg)

@@ -2,6 +2,7 @@ package googleauth
 
 import (
 	"Redis-Exploration/websocket/dao"
+	. "Redis-Exploration/websocket/models"
 	"Redis-Exploration/websocket/util"
 	"context"
 	"crypto/rand"
@@ -73,12 +74,14 @@ func randToken() string {
 func initGoogleAuth(c Credentials) {
 	// Gob encoding for gorilla/sessions
 	gob.Register(&oauth2.Token{})
-	gob.Register(&Profile{})
+	gob.Register(&GoogleProfile{})
 
 	conf = &oauth2.Config{
 		ClientID:     c.Cid,
 		ClientSecret: c.Csecret,
-		RedirectURL:  "http://localhost:3000/googleauth/auth",
+		// no redirect url is set, refer to https://stackoverflow.com/questions/28321570/google-oauth-2-0-error-redirect-uri-mismatch
+		RedirectURL: "postmessage",
+		// RedirectURL: "",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
 		},
@@ -126,7 +129,7 @@ func getLoginURL(w http.ResponseWriter, r *http.Request) {
 	util.RespondWithJSON(w, http.StatusOK, loginURL)
 }
 
-func fetchProfile(ctx context.Context, tok *oauth2.Token) (*Profile, error) {
+func fetchProfile(ctx context.Context, tok *oauth2.Token) (*GoogleProfile, error) {
 	client := conf.Client(ctx, tok)
 	email, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
@@ -152,7 +155,7 @@ func fetchProfile(ctx context.Context, tok *oauth2.Token) (*Profile, error) {
 	//  "email_verified": true
 	// }
 
-	return &Profile{
+	return &GoogleProfile{
 		ID:          res["sub"].(string),
 		DisplayName: res["given_name"].(string),
 		FullName:    res["name"].(string),
@@ -223,6 +226,25 @@ func authCallbackHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func RetrieveGoogleUserProfile(code string) GoogleProfile {
+	fmt.Println("Starting RetrieveGoogleUserProfile")
+	tok, err := conf.Exchange(oauth2.NoContext, code)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("after exchange")
+	fmt.Println(tok)
+
+	profile, err := fetchProfile(oauth2.NoContext, tok)
+	// ctx := context.Background()
+	// profile, err := fetchProfile(ctx, tok)
+	if err != nil {
+		panic(err)
+	}
+
+	return *profile
+}
+
 func CreateRoutes(c Credentials, r *mux.Router, _dao *dao.ShittyMusicDAO) {
 
 	// store = *cookieStore
@@ -234,10 +256,10 @@ func CreateRoutes(c Credentials, r *mux.Router, _dao *dao.ShittyMusicDAO) {
 	}
 	initGoogleAuth(c)
 
-	r.HandleFunc("/googleauth/loginurl", getLoginURL).Methods("GET", "OPTIONS")
-	r.HandleFunc("/googleauth/auth", authCallbackHandler).Methods("GET", "OPTIONS")
+	// r.HandleFunc("/googleauth/loginurl", getLoginURL).Methods("GET", "OPTIONS")
+	// r.HandleFunc("/googleauth/auth", authCallbackHandler).Methods("GET", "OPTIONS")
 }
 
-type Profile struct {
-	ID, DisplayName, FullName, ImageURL, Email string
-}
+// type Profile struct {
+// 	ID, DisplayName, FullName, ImageURL, Email string
+// }
