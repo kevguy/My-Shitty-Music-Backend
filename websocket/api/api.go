@@ -120,6 +120,19 @@ func GetSongsPlaysEndPoint(w http.ResponseWriter, r *http.Request) {
 	util.RespondWithJSON(w, http.StatusOK, vals)
 }
 
+func GetUserUpvotesEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	params := mux.Vars(r)
+	user, err := shittyMusicDao.FindUserByID(params["id"])
+	if err != nil {
+		util.RespondWithError(w, http.StatusBadRequest, "Invalid User ID")
+		return
+	}
+	util.RespondWithJSON(w, http.StatusOK, map[string]interface{}{
+		"upvotes": user.Hearts,
+	})
+}
+
 // HandleAPI sets up how to handle API calls
 func HandleAPI(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *redisclient.ShittyMusicRedisDAO) {
 	fmt.Println("Setting up Api Calls")
@@ -133,4 +146,5 @@ func HandleAPI(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *redisclient.S
 	r.HandleFunc("/songs", DeleteSongEndPoint).Methods("DELETE", "OPTIONS")
 	r.HandleFunc("/songs/{id}", FindSongEndpoint).Methods("GET")
 
+	r.HandleFunc("/users/upvotes/{id}", GetUserUpvotesEndPoint).Methods("GET", "OPTIONS")
 }

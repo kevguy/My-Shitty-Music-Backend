@@ -2,11 +2,14 @@ package mywebsocket
 
 import (
 	"Redis-Exploration/websocket/dao"
+	"Redis-Exploration/websocket/googleauth"
 	"Redis-Exploration/websocket/redis"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -17,6 +20,12 @@ import (
 type Message struct {
 	Type    string `json:"type"`
 	Content string `json:"content"`
+}
+
+type UpvoteMsg struct {
+	SongID string `json:"song_id"`
+	UserID string `json:"user_id"`
+	Token  string `json:"token"`
 }
 
 var clients = make(map[*websocket.Conn]bool) // connected clients
@@ -108,7 +117,26 @@ func handleMessage() {
 	}
 }
 
-func handleUpvote(songID string) {
+func handleUpvote(input string) {
+	result := strings.Split(input, ":")
+	if len(result) != 3 {
+		return
+	}
+
+	token := result[0]
+	userID := result[1]
+	songID := result[2]
+
+	authentication := googleauth.InitJWTAuthentication()
+	fmt.Println(authentication)
+
+	// Verify Token
+	fmt.Println("Verifying Token")
+	tokenValid := authentication.VerifyToken(userID, token)
+	if !tokenValid {
+		return
+	}
+
 	// Find song
 	song, err := shittyMusicDao.FindSongByID(songID)
 	if err != nil {
@@ -118,14 +146,35 @@ func handleUpvote(songID string) {
 
 	// Update song
 	song.Upvotes++
-	if err := shittyMusicDao.UpdateSong(song); err != nil {
+	if err = shittyMusicDao.UpdateSong(song); err != nil {
 		// can't update database
 		return
 	}
 
+	user, err := shittyMusicDao.FindUserByID(userID)
+	if err != nil {
+		// can't find song
+		return
+	}
+	user.Hearts = append(user.Hearts, songID)
+
+	err = shittyMusicDao.UpdateUser(user)
+	if err != nil {
+		// can't update user
+		return
+	}
+
+	str := strconv.Itoa(song.Upvotes)
+	content, _ := json.Marshal(map[string]string{
+		"userid":   user.ID.Hex(),
+		"username": user.Name,
+		"songid":   song.ID.Hex(),
+		"song":     song.Name,
+		"upvotes":  str,
+	})
 	msg := Message{
 		Type:    "upvote",
-		Content: songID + ":" + string(song.Upvotes),
+		Content: string(content),
 	}
 
 	BroadcastMsg(msg)

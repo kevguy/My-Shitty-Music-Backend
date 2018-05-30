@@ -104,6 +104,19 @@ func (m *ShittyMusicDAO) UpdateSong(song Song) error {
 	return err
 }
 
+// FindUserByID finds a user by ID
+func (m *ShittyMusicDAO) FindUserByID(userID string) (User, error) {
+	var user User
+	err := db.C(USER_COLLECTION).FindId(bson.ObjectIdHex(userID)).One(&user)
+	return user, err
+}
+
+// UpdateUser updates a user
+func (m *ShittyMusicDAO) UpdateUser(user User) error {
+	err := db.C(USER_COLLECTION).UpdateId(user.ID, &user)
+	return err
+}
+
 // InsertGoogleUser saves a new Google user
 func (m *ShittyMusicDAO) InsertGoogleUser(profile GoogleProfile) error {
 	user := User{
@@ -114,6 +127,7 @@ func (m *ShittyMusicDAO) InsertGoogleUser(profile GoogleProfile) error {
 		DisplayName: profile.DisplayName,
 		ProfilePic:  profile.ImageURL,
 		Email:       profile.Email,
+		Hearts:      []string{},
 	}
 	err := db.C(USER_COLLECTION).Insert(&user)
 	return err
