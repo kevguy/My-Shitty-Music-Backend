@@ -23,6 +23,11 @@ type GoogleRequest struct {
 	Code string `bson:"code" json:"code"`
 }
 
+type VerifyRequest struct {
+	UserID string `bson:"user_id" json:"user_id"`
+	Token  string `bson:"token" json:"token"`
+}
+
 func AuthenticateEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	data, _ := ioutil.ReadAll(r.Body)
@@ -40,7 +45,7 @@ func AuthenticateEndPoint(w http.ResponseWriter, r *http.Request) {
 		util.RespondWithError(w, http.StatusUnauthorized, "Invalid Authentication Request")
 		return
 	}
-	// util.RespondWithJSON(w, http.StatusOK, googleRequest)
+
 	if googleRequest.Type == "google" {
 		authentication := InitJWTAuthentication()
 		fmt.Println(authentication)
@@ -75,7 +80,7 @@ func AuthenticateEndPoint(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Generate token
-		token, err := authentication.GenerateToken(user.ID.String())
+		token, err := authentication.GenerateToken(user.ID.Hex())
 		if err != nil {
 			panic(err)
 		}
@@ -84,46 +89,50 @@ func AuthenticateEndPoint(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Send token and basic user info
 		response, _ := json.Marshal(map[string]string{"token": token})
 		fmt.Println(string(response))
-		util.RespondWithJSON(w, http.StatusOK, map[string]string{"token": token})
-		// util.RespondWithJSON(w, http.StatusOK, googleRequest)
+		util.RespondWithJSON(w, http.StatusOK, map[string]string{
+			"token":     token,
+			"user_name": user.Name,
+			"user_id":   user.ID.Hex(),
+		})
 	} else {
 		util.RespondWithError(w, http.StatusUnauthorized, "Not Supported")
 	}
 	return
-	/*
-		if googleRequest.Type == "google" {
-			authentication := InitJWTAuthentication()
+}
 
-			code := googleRequest.Code
-			// Retrieve Google Profile
-			profile := RetrieveGoogleUserProfile(code)
+func CheckLoginEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	data, _ := ioutil.ReadAll(r.Body)
+	log.Println("Authentication Request body: ", string(data))
 
-			// Find user
-			fmt.Println(profile.DisplayName)
-			user, err := shittyMusicDao.FindGoogleUser(profile.ID)
+	var verifyRequest VerifyRequest
+	if err := json.Unmarshal(data, &verifyRequest); err != nil {
+		util.RespondWithError(w, http.StatusUnauthorized, "Invalid Authentication Request")
+		return
+	}
+	fmt.Println(verifyRequest)
+	fmt.Println(verifyRequest.UserID)
+	fmt.Println(verifyRequest.Token)
+	if verifyRequest.UserID == "" || verifyRequest.Token == "" {
+		util.RespondWithError(w, http.StatusUnauthorized, "Invalid Authentication Request")
+		return
+	}
 
-			// User not found ==> Create New user
+	// Verify Login
+	authentication := InitJWTAuthentication()
+	fmt.Println(authentication)
 
-			// Generate token
-			token, err := authentication.GenerateToken(user.UUID)
-			if err != nil {
-				panic(err)
-			}
-			if err != nil {
-				util.RespondWithError(w, http.StatusInternalServerError, err.Error())
-				return
-			}
-
-			response, _ := json.Marshal(map[string]string{"token": token})
-			util.RespondWithJSON(w, http.StatusOK, response)
-
-		} else {
-			util.RespondWithError(w, http.StatusUnauthorized, "Not Supported")
-			return
-		}
-	*/
+	// Verify Token
+	fmt.Println("Verifying Token")
+	if result := authentication.VerifyToken(verifyRequest.UserID, verifyRequest.Token); result {
+		util.RespondWithJSON(w, http.StatusOK, map[string]bool{"status": true})
+	} else {
+		util.RespondWithJSON(w, http.StatusOK, map[string]bool{"status": false})
+	}
+	return
 }
 
 func CreateAuthenticationRoutes(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *redisclient.ShittyMusicRedisDAO) {
@@ -132,6 +141,7 @@ func CreateAuthenticationRoutes(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisD
 	shittyMusicRedisDao = *_redisDao
 
 	r.HandleFunc("/authenticate", AuthenticateEndPoint).Methods("POST", "OPTIONS")
+	r.HandleFunc("/check-login", CheckLoginEndPoint).Methods("POST", "OPTIONS")
 	// r.HandleFunc("/refresh-token-auth").Methods("GET", "OPTIONS")
 	// r.HandleFunc("/logout").Methods("GET", "OPTIONS")
 }

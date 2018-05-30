@@ -31,6 +31,11 @@ const (
 
 var jwtAuthentication *JWTAuthentication = nil
 
+type MyCustomClaims struct {
+	Sub string `json:"sub"`
+	jwt.StandardClaims
+}
+
 func getPrivateKey() *rsa.PrivateKey {
 	abs, err := filepath.Abs("./googleauth/private_key.txt")
 	if err != nil {
@@ -99,6 +104,7 @@ func getPublicKey() *rsa.PublicKey {
 	return rsaPub
 }
 
+// InitJWTAuthentication instantiates a JWTAuthentication instance
 func InitJWTAuthentication() *JWTAuthentication {
 	if jwtAuthentication == nil {
 		jwtAuthentication = &JWTAuthentication{
@@ -110,22 +116,74 @@ func InitJWTAuthentication() *JWTAuthentication {
 	return jwtAuthentication
 }
 
-func (authentication *JWTAuthentication) GenerateToken(userUUID string) (string, error) {
+// GenerateToken generates a token based on the userID given
+func (authentication *JWTAuthentication) GenerateToken(userID string) (string, error) {
 	const JWTExpirationDelta = 72
-	token := jwt.NewWithClaims(jwt.SigningMethodRS512, jwt.MapClaims{
-		"exp": time.Now().Add(time.Hour * time.Duration(JWTExpirationDelta)).Unix(),
-		"iat": time.Now().Unix(),
-		"sub": userUUID,
-	})
+
+	// Create the Claims
+	claims := MyCustomClaims{
+		userID,
+		jwt.StandardClaims{
+			IssuedAt:  time.Now().Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * time.Duration(JWTExpirationDelta)).Unix(),
+			Issuer:    "Fabulous Kev Kev",
+		},
+	}
+	// token := jwt.NewWithClaims(jwt.SigningMethodRS512, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// token := jwt.NewWithClaims(jwt.SigningMethodRS512, jwt.MapClaims{
+	// 	"exp": time.Now().Add(time.Hour * time.Duration(JWTExpirationDelta)).Unix(),
+	// 	"iat": time.Now().Unix(),
+	// 	"sub": userID,
+	// })
 
 	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString(authentication.privateKey)
+	// tokenString, err := token.SignedString(authentication.privateKey)
+	tokenString, err := token.SignedString([]byte("motherfucker"))
 	if err != nil {
 		panic(err)
-		return "", err
 	}
-	fmt.Println(tokenString, err)
+	fmt.Printf("%v %v", tokenString, err)
 	return tokenString, nil
+}
+
+func (authentication *JWTAuthentication) VerifyToken(userID string, tokenStr string) bool {
+
+	token, err := jwt.ParseWithClaims(tokenStr, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("motherfucker"), nil
+	})
+	fmt.Println("token parsed")
+	fmt.Println(token.Valid)
+	fmt.Println(token.Claims)
+	fmt.Println(token)
+
+	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
+		fmt.Printf("%v %v\n", claims.Sub, claims.StandardClaims.ExpiresAt)
+		fmt.Println(claims.Sub)
+		fmt.Println(claims.StandardClaims.ExpiresAt)
+		fmt.Println(claims.StandardClaims.IssuedAt)
+		fmt.Println(claims.StandardClaims.Issuer)
+		res := authentication.GetTokenRemainingValidity(claims.ExpiresAt)
+		fmt.Println(res)
+	} else {
+		fmt.Println(ok)
+		fmt.Println(err)
+		return false
+	}
+
+	return true
+}
+
+func (authentication *JWTAuthentication) GetTokenRemainingValidity(timestamp interface{}) int {
+	if validity, ok := timestamp.(float64); ok {
+		tm := time.Unix(int64(validity), 0)
+		remainder := tm.Sub(time.Now())
+		if remainder > 0 {
+			return int(remainder.Seconds() + expireOffset)
+		}
+	}
+	return expireOffset
 }
 
 func (authentication *JWTAuthentication) Authenticate(user User) bool {
@@ -141,15 +199,4 @@ func (authentication *JWTAuthentication) Authenticate(user User) bool {
 	}
 
 	return user.Username == testUser.Username && bcrypt.CompareHashAndPassword([]byte(testUser.Password), []byte(user.Password)) == nil
-}
-
-func (authentication *JWTAuthentication) getTokenRemainingValidity(timestamp interface{}) int {
-	if validity, ok := timestamp.(float64); ok {
-		tm := time.Unix(int64(validity), 0)
-		remainder := tm.Sub(time.Now())
-		if remainder > 0 {
-			return int(remainder.Seconds() + expireOffset)
-		}
-	}
-	return expireOffset
 }
