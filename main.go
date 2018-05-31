@@ -27,15 +27,18 @@ var shittyMusicRedisDAO = redisclient.ShittyMusicRedisDAO{}
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func initEnv() {
 	fmt.Println("initEnv")
+
 	// Read .env
 	// then you can use for instance, os.Getenv("S3_BUCKET_NAME") to get the value
 	fEnvFile := flag.String("env-file", "", "path to environment file")
+	mode := flag.String("mode", "", "dev/production mode")
 	flag.Parse()
-
-	if *fEnvFile != "" {
-		err := util.LoadEnvFile(*fEnvFile)
-		if err != nil {
-			log.Fatal(err)
+	if *mode == "dev" {
+		if *fEnvFile != "" {
+			err := util.LoadEnvFile(*fEnvFile)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 

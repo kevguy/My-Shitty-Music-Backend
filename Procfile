@@ -1,1 +1,1 @@
-web: go run main.go -env-file=.env
+web: My-Shitty-Music-Backend -mode=production
