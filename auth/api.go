@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/codegangsta/negroni"
 	. "github.com/kevguy/My-Shitty-Music-Backend/models"
 	"github.com/kevguy/My-Shitty-Music-Backend/mongodb"
 	"github.com/kevguy/My-Shitty-Music-Backend/redis"
@@ -30,7 +31,21 @@ type VerifyRequest struct {
 	Token  string `bson:"token" json:"token"`
 }
 
-func AuthenticateEndPoint(w http.ResponseWriter, r *http.Request) {
+func HandlePreflight(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	fmt.Println(r.Method)
+	if r.Method == "OPTIONS" {
+		fmt.Println("preflight")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		util.RespondWithJSON(w, http.StatusOK, "")
+
+		return
+	}
+	next(w, r)
+}
+
+func AuthenticateEndPoint(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	defer r.Body.Close()
 	data, _ := ioutil.ReadAll(r.Body)
 	log.Println("Authentication Request body: ", string(data))
@@ -146,7 +161,12 @@ func CreateAuthenticationRoutes(r *mux.Router,
 	shittyMusicRedisDao = *_redisDao
 	authentication = *_authentication
 
-	r.HandleFunc("/authenticate", AuthenticateEndPoint).Methods("POST", "OPTIONS")
+	r.Handle("/authenticate", negroni.New(
+		negroni.HandlerFunc(HandlePreflight),
+		negroni.HandlerFunc(AuthenticateEndPoint),
+	)).Methods("POST", "OPTIONS")
+
+	// r.HandleFunc("/authenticate", AuthenticateEndPoint).Methods("POST", "OPTIONS")
 	r.HandleFunc("/check-login", CheckLoginEndPoint).Methods("POST", "OPTIONS")
 	// r.HandleFunc("/refresh-token-auth").Methods("GET", "OPTIONS")
 	// r.HandleFunc("/logout").Methods("GET", "OPTIONS")
