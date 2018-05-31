@@ -2,6 +2,9 @@
 	"ImportPath": "github.com/kevguy/My-Shitty-Music-Backend",
 	"GoVersion": "go1.10",
 	"GodepVersion": "v80",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "cloud.google.com/go/compute/metadata",
