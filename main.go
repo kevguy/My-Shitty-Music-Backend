@@ -8,18 +8,18 @@ import (
 	"net/http"
 	"os"
 
-	"My-Shitty-Music-Backend/api"
-	"My-Shitty-Music-Backend/dao"
-	"My-Shitty-Music-Backend/googleauth"
-	"My-Shitty-Music-Backend/mywebsocket"
-	"My-Shitty-Music-Backend/redis"
-	"My-Shitty-Music-Backend/util"
+	"github.com/kevguy/My-Shitty-Music-Backend/api"
+	"github.com/kevguy/My-Shitty-Music-Backend/auth"
+	"github.com/kevguy/My-Shitty-Music-Backend/mongodb"
+	"github.com/kevguy/My-Shitty-Music-Backend/mywebsocket"
+	"github.com/kevguy/My-Shitty-Music-Backend/redis"
+	"github.com/kevguy/My-Shitty-Music-Backend/util"
 
 	"github.com/gorilla/mux"
 )
 
-var shittyMusicDAO = dao.ShittyMusicDAO{}
-var googleCredientials = googleauth.Credentials{}
+var shittyMusicDAO = mongodb.ShittyMusicDAO{}
+var googleCredientials = auth.Credentials{}
 var shittyMusicRedisDAO = redisclient.ShittyMusicRedisDAO{}
 
 // var store = sessions.NewCookieStore([]byte("something-very-secret"))
@@ -40,7 +40,7 @@ func initEnv() {
 	}
 
 	// Init MongoDB's Song DAO
-	shittyMusicDAO = dao.ShittyMusicDAO{
+	shittyMusicDAO = mongodb.ShittyMusicDAO{
 		Server:   os.Getenv("MONGOLAB_SERVER"),
 		Database: os.Getenv("MONGOLAB_DATABASE"),
 		Addr:     os.Getenv("MONGOLAB_ADDR"),
@@ -49,7 +49,7 @@ func initEnv() {
 	}
 	shittyMusicDAO.Connect()
 
-	googleCredientials = googleauth.Credentials{
+	googleCredientials = auth.Credentials{
 		Cid:     os.Getenv("GOOGLE_AUTH_CLIENT_ID"),
 		Csecret: os.Getenv("GOOGLE_AUTH_CLIENT_SECRET"),
 	}
@@ -78,9 +78,9 @@ func main() {
 	// Setup websocket
 	mywebsocket.CreateWebsocket(r, &shittyMusicDAO, &shittyMusicRedisDAO)
 
-	authentication := googleauth.InitJWTAuthentication()
-	googleauth.CreateRoutes(googleCredientials, r, &shittyMusicDAO)
-	googleauth.CreateAuthenticationRoutes(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)
+	authentication := auth.InitJWTAuthentication()
+	auth.CreateRoutes(googleCredientials, r)
+	auth.CreateAuthenticationRoutes(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)
 
 	// Setup API Calls
 	api.HandleAPI(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)

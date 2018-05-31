@@ -1,21 +1,22 @@
-package googleauth
+package auth
 
 import (
-	"My-Shitty-Music-Backend/dao"
-	. "My-Shitty-Music-Backend/models"
-	"My-Shitty-Music-Backend/redis"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 
+	. "github.com/kevguy/My-Shitty-Music-Backend/models"
+	"github.com/kevguy/My-Shitty-Music-Backend/mongodb"
+	"github.com/kevguy/My-Shitty-Music-Backend/redis"
+
 	"github.com/gorilla/mux"
 
-	"My-Shitty-Music-Backend/util"
+	"github.com/kevguy/My-Shitty-Music-Backend/util"
 )
 
-var shittyMusicDao dao.ShittyMusicDAO
+var shittyMusicDao mongodb.ShittyMusicDAO
 var shittyMusicRedisDao redisclient.ShittyMusicRedisDAO
 var authentication JWTAuthentication
 
@@ -137,7 +138,7 @@ func CheckLoginEndPoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateAuthenticationRoutes(r *mux.Router,
-	_dao *dao.ShittyMusicDAO,
+	_dao *mongodb.ShittyMusicDAO,
 	_redisDao *redisclient.ShittyMusicRedisDAO,
 	_authentication *JWTAuthentication) {
 	fmt.Println("Setting up Authentication Routes")

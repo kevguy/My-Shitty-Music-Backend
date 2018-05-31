@@ -1,9 +1,6 @@
 package mywebsocket
 
 import (
-	"My-Shitty-Music-Backend/dao"
-	"My-Shitty-Music-Backend/googleauth"
-	"My-Shitty-Music-Backend/redis"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,6 +8,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/kevguy/My-Shitty-Music-Backend/auth"
+	"github.com/kevguy/My-Shitty-Music-Backend/mongodb"
+	"github.com/kevguy/My-Shitty-Music-Backend/redis"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -31,7 +32,7 @@ type UpvoteMsg struct {
 var clients = make(map[*websocket.Conn]bool) // connected clients
 var broadcast = make(chan Message)           // broadcast channel
 
-var shittyMusicDao dao.ShittyMusicDAO
+var shittyMusicDao mongodb.ShittyMusicDAO
 var shittyMusicRedisDao redisclient.ShittyMusicRedisDAO
 
 var upgrader = websocket.Upgrader{
@@ -79,20 +80,6 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BroadcastMsg(msg Message) error {
-	// Send it out to every client that is currently connected
-	for client := range clients {
-		err := client.WriteJSON(msg)
-		if err != nil {
-			log.Printf("error: %v", err)
-			client.Close()
-			delete(clients, client)
-			return err
-		}
-	}
-	return nil
-}
-
 func handleMessage() {
 	for {
 		// Grab the next message from the broadcast channel
@@ -127,7 +114,7 @@ func handleUpvote(input string) {
 	userID := result[1]
 	songID := result[2]
 
-	authentication := googleauth.InitJWTAuthentication()
+	authentication := auth.InitJWTAuthentication()
 	fmt.Println(authentication)
 
 	// Verify Token
@@ -212,7 +199,7 @@ func handlePlay(songID string) {
 }
 
 // CreateWebsocket sets up the websocket
-func CreateWebsocket(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *redisclient.ShittyMusicRedisDAO) {
+func CreateWebsocket(r *mux.Router, _dao *mongodb.ShittyMusicDAO, _redisDao *redisclient.ShittyMusicRedisDAO) {
 	fmt.Println("Setting up Websocket")
 	shittyMusicDao = *_dao
 	shittyMusicRedisDao = *_redisDao
@@ -223,41 +210,3 @@ func CreateWebsocket(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *rediscl
 	// Start listening for incoming chat messages
 	go handleMessage()
 }
-
-// r.HandleFunc("/websocket", func(w http.ResponseWriter, r *http.Request) {
-// 	ws, err := upgrader.Upgrade(w, r, nil)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return
-// 	}
-// 	for {
-// 		msgType, msg, err := ws.ReadMessage()
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return
-// 		}
-// 		if string(msg) == "ping" {
-// 			fmt.Println("ping")
-// 			time.Sleep(2 * time.Second)
-// 			err = ws.WriteMessage(msgType, []byte("pong"))
-// 			if err != nil {
-// 				fmt.Println(err)
-// 				return
-// 			}
-// 		} else {
-// 			// ws.Close()
-// 			fmt.Println(string(msg))
-// 			var dat map[string]interface{}
-// 			if err := json.Unmarshal(msg, &dat); err != nil {
-// 				panic(err)
-// 			}
-// 			fmt.Println(dat)
-// 			err = ws.WriteMessage(msgType, []byte(msg))
-// 			if err != nil {
-// 				fmt.Println(err)
-// 				return
-// 			}
-// 			// return
-// 		}
-// 	}
-// })

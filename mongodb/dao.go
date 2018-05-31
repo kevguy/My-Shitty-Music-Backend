@@ -1,12 +1,11 @@
-package dao
+package mongodb
 
 import (
 	"fmt"
 	"log"
 	"time"
 
-	. "My-Shitty-Music-Backend/models"
-
+	models "github.com/kevguy/My-Shitty-Music-Backend/models"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -73,53 +72,53 @@ func (m *ShittyMusicDAO) Connect() {
 }
 
 // FindAllSongs finds list of songs
-func (m *ShittyMusicDAO) FindAllSongs() ([]Song, error) {
-	var songs []Song
+func (m *ShittyMusicDAO) FindAllSongs() ([]models.Song, error) {
+	var songs []models.Song
 	err := db.C(COLLECTION).Find(bson.M{}).All(&songs)
 	return songs, err
 }
 
 // FindSongByID finds song by ID
-func (m *ShittyMusicDAO) FindSongByID(id string) (Song, error) {
-	var song Song
+func (m *ShittyMusicDAO) FindSongByID(id string) (models.Song, error) {
+	var song models.Song
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&song)
 	return song, err
 }
 
 // InsertSong inserts a song
-func (m *ShittyMusicDAO) InsertSong(song Song) error {
+func (m *ShittyMusicDAO) InsertSong(song models.Song) error {
 	err := db.C(COLLECTION).Insert(&song)
 	return err
 }
 
 // DeleteSong deletes a song
-func (m *ShittyMusicDAO) DeleteSong(song Song) error {
+func (m *ShittyMusicDAO) DeleteSong(song models.Song) error {
 	err := db.C(COLLECTION).Remove(&song)
 	return err
 }
 
 // UpdateSong updates a song
-func (m *ShittyMusicDAO) UpdateSong(song Song) error {
+func (m *ShittyMusicDAO) UpdateSong(song models.Song) error {
 	err := db.C(COLLECTION).UpdateId(song.ID, &song)
 	return err
 }
 
 // FindUserByID finds a user by ID
-func (m *ShittyMusicDAO) FindUserByID(userID string) (User, error) {
-	var user User
+func (m *ShittyMusicDAO) FindUserByID(userID string) (models.User, error) {
+	var user models.User
 	err := db.C(USER_COLLECTION).FindId(bson.ObjectIdHex(userID)).One(&user)
 	return user, err
 }
 
 // UpdateUser updates a user
-func (m *ShittyMusicDAO) UpdateUser(user User) error {
+func (m *ShittyMusicDAO) UpdateUser(user models.User) error {
 	err := db.C(USER_COLLECTION).UpdateId(user.ID, &user)
 	return err
 }
 
 // InsertGoogleUser saves a new Google user
-func (m *ShittyMusicDAO) InsertGoogleUser(profile GoogleProfile) error {
-	user := User{
+func (m *ShittyMusicDAO) InsertGoogleUser(profile models.GoogleProfile) error {
+	user := models.User{
 		ID:          bson.NewObjectId(),
 		GoogleID:    profile.ID,
 		Type:        "google",
@@ -134,14 +133,14 @@ func (m *ShittyMusicDAO) InsertGoogleUser(profile GoogleProfile) error {
 }
 
 // FindGoogleUser finds a user that logs in using Google
-func (m *ShittyMusicDAO) FindGoogleUser(googleID string) (User, error) {
+func (m *ShittyMusicDAO) FindGoogleUser(googleID string) (models.User, error) {
 	// var users []User
 	// err := db.C(USER_COLLECTION).Find(bson.M{"type": "google", "google_id": googleID}).All(&users)
 	// if len(users) == 0 {
 	// 	return users, err
 	// }
 	// return users[0], err
-	var user User
+	var user models.User
 	err := db.C(USER_COLLECTION).Find(bson.M{"type": "google", "google_id": googleID}).One(&user)
 	return user, err
 }

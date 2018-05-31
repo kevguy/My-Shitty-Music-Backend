@@ -1,4 +1,4 @@
-package googleauth
+package auth
 
 import (
 	"bufio"
@@ -13,9 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	jwt "github.com/dgrijalva/jwt-go"
-
-	. "My-Shitty-Music-Backend/models"
-
+	"github.com/kevguy/My-Shitty-Music-Backend/models"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -37,7 +35,7 @@ type MyCustomClaims struct {
 }
 
 func getPrivateKey() *rsa.PrivateKey {
-	abs, err := filepath.Abs("./googleauth/private_key.txt")
+	abs, err := filepath.Abs("./auth/private_key.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -68,7 +66,7 @@ func getPrivateKey() *rsa.PrivateKey {
 }
 
 func getPublicKey() *rsa.PublicKey {
-	abs, err := filepath.Abs("./googleauth/public_key.pub")
+	abs, err := filepath.Abs("./auth/public_key.pub")
 	if err != nil {
 		panic(err)
 	}
@@ -210,13 +208,13 @@ func (authentication *JWTAuthentication) GetTokenRemainingValidity(timestamp int
 	return expireOffset
 }
 
-func (authentication *JWTAuthentication) Authenticate(user User) bool {
+func (authentication *JWTAuthentication) Authenticate(user models.User) bool {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("testing"), 10)
 	uuidStr, err := uuid.NewV4()
 	if err != nil {
 		panic(err)
 	}
-	testUser := User{
+	testUser := models.User{
 		UUID:     uuidStr.String(),
 		Username: "John Doe",
 		Password: string(hashedPassword),
