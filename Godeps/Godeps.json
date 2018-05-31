@@ -1,0 +1,138 @@
+{
+	"ImportPath": "github.com/kevguy/My-Shitty-Music-Backend",
+	"GoVersion": "go1.10",
+	"GodepVersion": "v80",
+	"Deps": [
+		{
+			"ImportPath": "cloud.google.com/go/compute/metadata",
+			"Comment": "v0.23.0-19-gf07fddc",
+			"Rev": "f07fddce3276603951ac45f50f743de632956bef"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/negroni",
+			"Comment": "v0.3.0-13-g22c5532",
+			"Rev": "22c5532ea862c34fdad414e90f8cc00b4f6f4cab"
+		},
+		{
+			"ImportPath": "github.com/dgrijalva/jwt-go",
+			"Comment": "v3.2.0",
+			"Rev": "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis",
+			"Comment": "v6.11.0-2-gef33be4",
+			"Rev": "ef33be46cd3ecc8c9f0d16283d05f16dd6227a57"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal",
+			"Comment": "v6.11.0-2-gef33be4",
+			"Rev": "ef33be46cd3ecc8c9f0d16283d05f16dd6227a57"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/consistenthash",
+			"Comment": "v6.11.0-2-gef33be4",
+			"Rev": "ef33be46cd3ecc8c9f0d16283d05f16dd6227a57"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/hashtag",
+			"Comment": "v6.11.0-2-gef33be4",
+			"Rev": "ef33be46cd3ecc8c9f0d16283d05f16dd6227a57"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/pool",
+			"Comment": "v6.11.0-2-gef33be4",
+			"Rev": "ef33be46cd3ecc8c9f0d16283d05f16dd6227a57"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/proto",
+			"Comment": "v6.11.0-2-gef33be4",
+			"Rev": "ef33be46cd3ecc8c9f0d16283d05f16dd6227a57"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/singleflight",
+			"Comment": "v6.11.0-2-gef33be4",
+			"Rev": "ef33be46cd3ecc8c9f0d16283d05f16dd6227a57"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/util",
+			"Comment": "v6.11.0-2-gef33be4",
+			"Rev": "ef33be46cd3ecc8c9f0d16283d05f16dd6227a57"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.6.2-2-ge0b5aba",
+			"Rev": "e0b5abaaae35242fa74372f26c24107711702a4e"
+		},
+		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Comment": "v1.2.0-43-gc17c80c",
+			"Rev": "c17c80cb48b806045fc338c94c849909a2e41c12"
+		},
+		{
+			"ImportPath": "github.com/satori/go.uuid",
+			"Comment": "v1.2.0-4-g36e9d2e",
+			"Rev": "36e9d2ebbde5e3f13ab2e25625fd453271d6522e"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "ab813273cd59e1333f7ae7bff5d027d4aadf528c"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "ab813273cd59e1333f7ae7bff5d027d4aadf528c"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "1e491301e022f8f977054da4c2d852decd59571f"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context/ctxhttp",
+			"Rev": "1e491301e022f8f977054da4c2d852decd59571f"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "ec22f46f877b4505e0117eeaab541714644fdd28"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/google",
+			"Rev": "ec22f46f877b4505e0117eeaab541714644fdd28"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/internal",
+			"Rev": "ec22f46f877b4505e0117eeaab541714644fdd28"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/jws",
+			"Rev": "ec22f46f877b4505e0117eeaab541714644fdd28"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/jwt",
+			"Rev": "ec22f46f877b4505e0117eeaab541714644fdd28"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2016.08.01-5-g3f83fa5",
+			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/bson",
+			"Comment": "r2016.08.01-5-g3f83fa5",
+			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/json",
+			"Comment": "r2016.08.01-5-g3f83fa5",
+			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/sasl",
+			"Comment": "r2016.08.01-5-g3f83fa5",
+			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/scram",
+			"Comment": "r2016.08.01-5-g3f83fa5",
+			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+		}
+	]
+}
