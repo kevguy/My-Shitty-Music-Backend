@@ -106,7 +106,15 @@ func main() {
 	// if err := http.ListenAndServe(":3000", handlers.CORS(corsObj)(r)); err != nil {
 	// 	log.Fatal(err)
 	// }
-	if err := http.ListenAndServe(":3000", r); err != nil {
+
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		// log.Fatal("$PORT must be set")
+		port = "3000"
+	}
+
+	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal(err)
 	}
 }
