@@ -175,6 +175,30 @@ func (authentication *JWTAuthentication) VerifyToken(userID string, tokenStr str
 	return true
 }
 
+func (authentication *JWTAuthentication) GetUserID(tokenStr string) string {
+	token, err := jwt.ParseWithClaims(tokenStr, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("motherfucker"), nil
+	})
+	fmt.Println("token parsed")
+	fmt.Println(token.Valid)
+	fmt.Println(token.Claims)
+	fmt.Println(token)
+
+	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
+		fmt.Printf("%v %v\n", claims.Sub, claims.StandardClaims.ExpiresAt)
+		fmt.Println(claims.Sub)
+		fmt.Println(claims.StandardClaims.ExpiresAt)
+		fmt.Println(claims.StandardClaims.IssuedAt)
+		fmt.Println(claims.StandardClaims.Issuer)
+		fmt.Println(claims.Sub)
+		return claims.Sub
+	} else {
+		fmt.Println(ok)
+		fmt.Println(err)
+		return ""
+	}
+}
+
 func (authentication *JWTAuthentication) GetTokenRemainingValidity(timestamp interface{}) int {
 	if validity, ok := timestamp.(float64); ok {
 		tm := time.Unix(int64(validity), 0)

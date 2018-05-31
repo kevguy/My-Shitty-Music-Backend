@@ -108,7 +108,7 @@ func (c *ShittyMusicRedisDAO) GetPlays() ([]Plays, error) {
 		}
 
 		result = append(result, play)
-		fmt.Println("key", val)
+		// fmt.Println("key", val)
 	}
 	return result, err
 }

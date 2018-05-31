@@ -17,6 +17,7 @@ import (
 
 var shittyMusicDao dao.ShittyMusicDAO
 var shittyMusicRedisDao redisclient.ShittyMusicRedisDAO
+var authentication JWTAuthentication
 
 type GoogleRequest struct {
 	Type string `bson:"type" json:"type"`
@@ -47,7 +48,7 @@ func AuthenticateEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if googleRequest.Type == "google" {
-		authentication := InitJWTAuthentication()
+		// authentication := InitJWTAuthentication()
 		fmt.Println(authentication)
 
 		code := googleRequest.Code
@@ -122,7 +123,7 @@ func CheckLoginEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Verify Login
-	authentication := InitJWTAuthentication()
+	// authentication := InitJWTAuthentication()
 	fmt.Println(authentication)
 
 	// Verify Token
@@ -135,10 +136,14 @@ func CheckLoginEndPoint(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func CreateAuthenticationRoutes(r *mux.Router, _dao *dao.ShittyMusicDAO, _redisDao *redisclient.ShittyMusicRedisDAO) {
+func CreateAuthenticationRoutes(r *mux.Router,
+	_dao *dao.ShittyMusicDAO,
+	_redisDao *redisclient.ShittyMusicRedisDAO,
+	_authentication *JWTAuthentication) {
 	fmt.Println("Setting up Authentication Routes")
 	shittyMusicDao = *_dao
 	shittyMusicRedisDao = *_redisDao
+	authentication = *_authentication
 
 	r.HandleFunc("/authenticate", AuthenticateEndPoint).Methods("POST", "OPTIONS")
 	r.HandleFunc("/check-login", CheckLoginEndPoint).Methods("POST", "OPTIONS")

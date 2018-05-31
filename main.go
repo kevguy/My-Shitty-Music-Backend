@@ -78,11 +78,12 @@ func main() {
 	// Setup websocket
 	mywebsocket.CreateWebsocket(r, &shittyMusicDAO, &shittyMusicRedisDAO)
 
+	authentication := googleauth.InitJWTAuthentication()
 	googleauth.CreateRoutes(googleCredientials, r, &shittyMusicDAO)
-	googleauth.CreateAuthenticationRoutes(r, &shittyMusicDAO, &shittyMusicRedisDAO)
+	googleauth.CreateAuthenticationRoutes(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)
 
 	// Setup API Calls
-	api.HandleAPI(r, &shittyMusicDAO, &shittyMusicRedisDAO)
+	api.HandleAPI(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)
 
 	// Serves index html page
 	indexFile, err := os.Open("html/index.html")
@@ -96,6 +97,12 @@ func main() {
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, string(index))
 	})
+
+	// corsObj := handlers.AllowedOrigins([]string{"*"})
+	//
+	// if err := http.ListenAndServe(":3000", handlers.CORS(corsObj)(r)); err != nil {
+	// 	log.Fatal(err)
+	// }
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		log.Fatal(err)
 	}
