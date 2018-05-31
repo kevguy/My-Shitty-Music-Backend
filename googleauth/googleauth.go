@@ -1,9 +1,9 @@
 package googleauth
 
 import (
-	"Redis-Exploration/dao"
-	. "Redis-Exploration/models"
-	"Redis-Exploration/util"
+	"My-Shitty-Music-Backend/dao"
+	. "My-Shitty-Music-Backend/models"
+	"My-Shitty-Music-Backend/util"
 	"context"
 	"crypto/rand"
 	"encoding/base64"

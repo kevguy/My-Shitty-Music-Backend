@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"Redis-Exploration/dao"
-	"Redis-Exploration/googleauth"
-	"Redis-Exploration/models"
-	"Redis-Exploration/mywebsocket"
-	"Redis-Exploration/redis"
-	"Redis-Exploration/util"
+	"My-Shitty-Music-Backend/dao"
+	"My-Shitty-Music-Backend/googleauth"
+	"My-Shitty-Music-Backend/models"
+	"My-Shitty-Music-Backend/mywebsocket"
+	"My-Shitty-Music-Backend/redis"
+	"My-Shitty-Music-Backend/util"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"

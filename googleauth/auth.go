@@ -1,9 +1,9 @@
 package googleauth
 
 import (
-	"Redis-Exploration/dao"
-	. "Redis-Exploration/models"
-	"Redis-Exploration/redis"
+	"My-Shitty-Music-Backend/dao"
+	. "My-Shitty-Music-Backend/models"
+	"My-Shitty-Music-Backend/redis"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,7 +12,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"Redis-Exploration/util"
+	"My-Shitty-Music-Backend/util"
 )
 
 var shittyMusicDao dao.ShittyMusicDAO

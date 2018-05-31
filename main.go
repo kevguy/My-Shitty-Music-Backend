@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"os"
 
-	"Redis-Exploration/api"
-	"Redis-Exploration/dao"
-	"Redis-Exploration/googleauth"
-	"Redis-Exploration/mywebsocket"
-	"Redis-Exploration/redis"
-	"Redis-Exploration/util"
+	"My-Shitty-Music-Backend/api"
+	"My-Shitty-Music-Backend/dao"
+	"My-Shitty-Music-Backend/googleauth"
+	"My-Shitty-Music-Backend/mywebsocket"
+	"My-Shitty-Music-Backend/redis"
+	"My-Shitty-Music-Backend/util"
 
 	"github.com/gorilla/mux"
 )

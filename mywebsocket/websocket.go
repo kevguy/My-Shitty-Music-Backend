@@ -1,9 +1,9 @@
 package mywebsocket
 
 import (
-	"Redis-Exploration/dao"
-	"Redis-Exploration/googleauth"
-	"Redis-Exploration/redis"
+	"My-Shitty-Music-Backend/dao"
+	"My-Shitty-Music-Backend/googleauth"
+	"My-Shitty-Music-Backend/redis"
 	"encoding/json"
 	"fmt"
 	"log"

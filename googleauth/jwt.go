@@ -14,7 +14,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 
-	. "Redis-Exploration/models"
+	. "My-Shitty-Music-Backend/models"
 
 	uuid "github.com/satori/go.uuid"
 )
