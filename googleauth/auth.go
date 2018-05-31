@@ -1,9 +1,9 @@
 package googleauth
 
 import (
-	"Redis-Exploration/websocket/dao"
-	. "Redis-Exploration/websocket/models"
-	"Redis-Exploration/websocket/redis"
+	"Redis-Exploration/dao"
+	. "Redis-Exploration/models"
+	"Redis-Exploration/redis"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,7 +12,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"Redis-Exploration/websocket/util"
+	"Redis-Exploration/util"
 )
 
 var shittyMusicDao dao.ShittyMusicDAO

@@ -1,9 +1,9 @@
 package mywebsocket
 
 import (
-	"Redis-Exploration/websocket/dao"
-	"Redis-Exploration/websocket/googleauth"
-	"Redis-Exploration/websocket/redis"
+	"Redis-Exploration/dao"
+	"Redis-Exploration/googleauth"
+	"Redis-Exploration/redis"
 	"encoding/json"
 	"fmt"
 	"log"

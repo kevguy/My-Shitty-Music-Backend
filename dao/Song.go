@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	. "Redis-Exploration/websocket/models"
+	. "Redis-Exploration/models"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

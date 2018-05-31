@@ -14,7 +14,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 
-	. "Redis-Exploration/websocket/models"
+	. "Redis-Exploration/models"
 
 	uuid "github.com/satori/go.uuid"
 )

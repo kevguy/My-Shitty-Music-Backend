@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"os"
 
-	"Redis-Exploration/websocket/api"
-	"Redis-Exploration/websocket/dao"
-	"Redis-Exploration/websocket/googleauth"
-	"Redis-Exploration/websocket/mywebsocket"
-	"Redis-Exploration/websocket/redis"
-	"Redis-Exploration/websocket/util"
+	"Redis-Exploration/api"
+	"Redis-Exploration/dao"
+	"Redis-Exploration/googleauth"
+	"Redis-Exploration/mywebsocket"
+	"Redis-Exploration/redis"
+	"Redis-Exploration/util"
 
 	"github.com/gorilla/mux"
 )

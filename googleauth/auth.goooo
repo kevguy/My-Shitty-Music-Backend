@@ -1,8 +1,8 @@
 package googleauth
 
 import (
-	"Redis-Exploration/websocket/dao"
-	"Redis-Exploration/websocket/util"
+	"Redis-Exploration/dao"
+	"Redis-Exploration/util"
 	"context"
 	"encoding/gob"
 	"errors"

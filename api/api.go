@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"Redis-Exploration/websocket/dao"
-	. "Redis-Exploration/websocket/models"
-	"Redis-Exploration/websocket/mywebsocket"
-	"Redis-Exploration/websocket/redis"
-	"Redis-Exploration/websocket/util"
+	"Redis-Exploration/dao"
+	. "Redis-Exploration/models"
+	"Redis-Exploration/mywebsocket"
+	"Redis-Exploration/redis"
+	"Redis-Exploration/util"
 
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
