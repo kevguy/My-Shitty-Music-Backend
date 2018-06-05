@@ -10,7 +10,6 @@ import (
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	"github.com/kevguy/My-Shitty-Music-Backend/auth"
-	"github.com/kevguy/My-Shitty-Music-Backend/fcm"
 	"github.com/kevguy/My-Shitty-Music-Backend/mongodb"
 	"github.com/kevguy/My-Shitty-Music-Backend/redis"
 	"github.com/kevguy/My-Shitty-Music-Backend/util"
@@ -97,7 +96,7 @@ func CreateFCMRoutes(r *mux.Router,
 	shittyMusicRedisDao = *_redisDao
 	authentication = *_authentication
 
-	fcmClient = fcm.InitFcmClient()
+	fcmClient = InitFcmClient()
 
 	r.Handle("/update-fcm-token", negroni.New(
 		negroni.HandlerFunc(HandlePreflight),
