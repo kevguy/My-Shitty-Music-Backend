@@ -96,14 +96,14 @@ func CreateFCMRoutes(r *mux.Router,
 	shittyMusicRedisDao = *_redisDao
 	authentication = *_authentication
 
-	fcmClient = InitFcmClient()
+	fcmClient = *InitFcmClient()
+
+	r.HandleFunc("/send-fcm-hello", SendHelloEndPoint).Methods("GET")
 
 	r.Handle("/update-fcm-token", negroni.New(
 		negroni.HandlerFunc(HandlePreflight),
 		negroni.HandlerFunc(UpdateFCMTokenEndPoint),
 	)).Methods("POST", "OPTIONS")
-
-	f.Handle("/send-fcm-hello", SendHelloEndPoint).Methods("GET")
 
 	// r.HandleFunc("/authenticate", AuthenticateEndPoint).Methods("POST", "OPTIONS")
 	// r.HandleFunc("/check-login", CheckLoginEndPoint).Methods("POST", "OPTIONS")

@@ -18,8 +18,6 @@ type FcmClient struct {
 	ctx    context.Context
 }
 
-var fcmClient *FcmClient = nil
-
 func (fcmClient *FcmClient) SubscribeToBroadcastTopic(token string) {
 	registrationTokens := []string{
 		token,
@@ -110,7 +108,7 @@ func InitFcmClient() *FcmClient {
 		log.Fatalf("error getting Messaging client: %v\n", err)
 	}
 
-	fcmClient = &FcmClient{
+	fcmClient := &FcmClient{
 		ctx:    ctx,
 		client: client,
 	}
