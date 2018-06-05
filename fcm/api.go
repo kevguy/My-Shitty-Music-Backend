@@ -3,8 +3,6 @@ package fcm
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/codegangsta/negroni"
@@ -19,6 +17,10 @@ var shittyMusicDao mongodb.ShittyMusicDAO
 var shittyMusicRedisDao redisclient.ShittyMusicRedisDAO
 var authentication auth.JWTAuthentication
 var fcmClient FcmClient
+
+type TokenRequest struct {
+	Token string `bson:"token" json:"token"`
+}
 
 func HandlePreflight(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	fmt.Println(r.Method)
@@ -39,25 +41,30 @@ func UpdateFCMTokenEndPoint(w http.ResponseWriter, r *http.Request, next http.Ha
 	// find user
 	// grad fcm token
 	// update user and save back to mongodb
-	defer r.Body.Close()
-	data, _ := ioutil.ReadAll(r.Body)
-	log.Println("Authentication Request body: ", string(data))
+	fmt.Println("fuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuckfuck")
+
+	// data, _ := ioutil.ReadAll(r.Body)
+	// log.Println("Authentication Request body: ", string(data))
 
 	accessToken := r.Header.Get("x-access-token")
+	fmt.Println("accessToken")
+	fmt.Println(accessToken)
 	userID := authentication.GetUserID(accessToken)
+	fmt.Println("userID")
+	fmt.Println(userID)
 
 	if result := authentication.VerifyToken(userID, accessToken); !result {
 		fmt.Println("token failed")
 		util.RespondWithError(w, http.StatusBadRequest, "Invalid token")
 		return
 	}
-
-	type TokenRequest struct {
-		Token string `json:"token"`
-	}
+	defer r.Body.Close()
+	// fuck, _ := ioutil.ReadAll(r.Body)
+	// log.Println("Authentication Request body: ", string(fuck))
 
 	var tokenRequest TokenRequest
 	if err := json.NewDecoder(r.Body).Decode(&tokenRequest); err != nil {
+		fmt.Println("Invalid request payload")
 		fmt.Println(err.Error())
 		util.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return

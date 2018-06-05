@@ -65,7 +65,7 @@ func (fcmClient *FcmClient) BroadcastHello() {
 	message := &messaging.Message{
 		Notification: &messaging.Notification{
 			Title: "Hello World",
-			Body:  "Just dropping by and say a hello",
+			Body:  "Just dropping by and say a fuckin hello",
 		},
 		Android: &messaging.AndroidConfig{
 			// TTL: &oneHour,
@@ -84,6 +84,35 @@ func (fcmClient *FcmClient) BroadcastHello() {
 		Topic: "broadcast",
 	}
 	response, err := fcmClient.client.Send(fcmClient.ctx, message)
+	if err != nil {
+		log.Fatalln(err)
+	} else {
+		fmt.Println(response)
+	}
+
+	message = &messaging.Message{
+		Notification: &messaging.Notification{
+			Title: "Hello World",
+			Body:  "Just dropping by and say a hello",
+		},
+		Android: &messaging.AndroidConfig{
+			// TTL: &oneHour,
+			Notification: &messaging.AndroidNotification{
+				Icon:  "stock_ticker_update",
+				Color: "#f45342",
+			},
+		},
+		// APNS: &messaging.APNSConfig{
+		// 	Payload: &messaging.APNSPayload{
+		// 		Aps: &messaging.Aps{
+		// 			Badge: &badge,
+		// 		},
+		// 	},
+		// },
+		Token: "djTi9Lj89o4:APA91bGbK5OO9AHsiY3_C0lWgMrOzklxr8ywcz4qCn4j9a2KSV9cASdnDlfe9rBHDW-Dm0ItvKEyn5Z6i9g4GZpdv0L3gcNq9I5RUaSdXVm3AqyrmuHqF1FOFF59vRETU67KKzkfplfu",
+	}
+
+	response, err = fcmClient.client.Send(fcmClient.ctx, message)
 	if err != nil {
 		log.Fatalln(err)
 	} else {
