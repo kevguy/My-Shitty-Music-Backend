@@ -10,6 +10,7 @@ import (
 
 	"github.com/kevguy/My-Shitty-Music-Backend/api"
 	"github.com/kevguy/My-Shitty-Music-Backend/auth"
+	"github.com/kevguy/My-Shitty-Music-Backend/fcm"
 	"github.com/kevguy/My-Shitty-Music-Backend/mongodb"
 	"github.com/kevguy/My-Shitty-Music-Backend/mywebsocket"
 	"github.com/kevguy/My-Shitty-Music-Backend/redis"
@@ -21,6 +22,7 @@ import (
 var shittyMusicDAO = mongodb.ShittyMusicDAO{}
 var googleCredientials = auth.Credentials{}
 var shittyMusicRedisDAO = redisclient.ShittyMusicRedisDAO{}
+var fcmClient = fcm.FcmClient{}
 
 // var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
@@ -84,6 +86,9 @@ func main() {
 	authentication := auth.InitJWTAuthentication()
 	auth.CreateRoutes(googleCredientials, r)
 	auth.CreateAuthenticationRoutes(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)
+
+	// Set Fcm Calls
+	fcm.CreateFCMRoutes(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)
 
 	// Setup API Calls
 	api.HandleAPI(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)

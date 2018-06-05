@@ -15,6 +15,7 @@ type User struct {
 	ProfilePic  string        `bson:"profile_pic" json:"profile_pic"`
 	Email       string        `bson:"email" json:"email"`
 	Hearts      []string      `bson:"hearts" json:"hearts"`
+	FcmToken    string        `bson:"fcm_token" json:"fcm_token"`
 }
 
 // GoogleProfile for Google Auth

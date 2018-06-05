@@ -1,7 +1,7 @@
 https://jacobmartins.com/2016/03/07/practical-golang-using-websockets/
 
 go run main.go -env-file=../.env
-go run main.go -env-file=.env
+go run main.go -env-file=.env -mode=dev
 
 https://scotch.io/bar-talk/build-a-realtime-chat-server-with-go-and-websockets
 https://github.com/scotch-io/go-realtime-chat/blob/master/public/app.js
@@ -13,3 +13,8 @@ https://skarlso.github.io/2016/11/02/google-signin-with-go-part2/
 
 https://github.com/GoogleCloudPlatform/golang-samples/blob/master/getting-started/bookshelf/app/auth.go
 https://cloud.google.com/go/getting-started/authenticate-users
+
+
+
+
+run godep save ./...
