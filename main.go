@@ -78,6 +78,8 @@ func initEnv() {
 func main() {
 	initEnv()
 
+	fcmClient = *fcm.InitFcmClient()
+
 	r := mux.NewRouter()
 
 	// Setup websocket
@@ -88,10 +90,10 @@ func main() {
 	auth.CreateAuthenticationRoutes(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)
 
 	// Set Fcm Calls
-	fcm.CreateFCMRoutes(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)
+	fcm.CreateFCMRoutes(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication, &fcmClient)
 
 	// Setup API Calls
-	api.HandleAPI(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication)
+	api.HandleAPI(r, &shittyMusicDAO, &shittyMusicRedisDAO, authentication, &fcmClient)
 
 	// Serves index html page
 	indexFile, err := os.Open("html/index.html")

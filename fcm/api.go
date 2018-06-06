@@ -97,13 +97,13 @@ func SendHelloEndPoint(w http.ResponseWriter, r *http.Request) {
 func CreateFCMRoutes(r *mux.Router,
 	_dao *mongodb.ShittyMusicDAO,
 	_redisDao *redisclient.ShittyMusicRedisDAO,
-	_authentication *auth.JWTAuthentication) {
+	_authentication *auth.JWTAuthentication,
+	_fcmClient *FcmClient) {
 	fmt.Println("Setting up FCM Routes")
 	shittyMusicDao = *_dao
 	shittyMusicRedisDao = *_redisDao
 	authentication = *_authentication
-
-	fcmClient = *InitFcmClient()
+	fcmClient = *_fcmClient
 
 	r.HandleFunc("/send-fcm-hello", SendHelloEndPoint).Methods("GET")
 

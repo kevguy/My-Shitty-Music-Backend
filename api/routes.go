@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kevguy/My-Shitty-Music-Backend/auth"
+	"github.com/kevguy/My-Shitty-Music-Backend/fcm"
 	"github.com/kevguy/My-Shitty-Music-Backend/mongodb"
 	"github.com/kevguy/My-Shitty-Music-Backend/redis"
 
@@ -14,12 +15,14 @@ import (
 var shittyMusicDao mongodb.ShittyMusicDAO
 var shittyMusicRedisDao redisclient.ShittyMusicRedisDAO
 var authentication auth.JWTAuthentication
+var fcmClient fcm.FcmClient
 
 // HandleAPI sets up how to handle API calls
 func HandleAPI(r *mux.Router,
 	_dao *mongodb.ShittyMusicDAO,
 	_redisDao *redisclient.ShittyMusicRedisDAO,
-	_authentication *auth.JWTAuthentication) {
+	_authentication *auth.JWTAuthentication,
+	_fcmClient *fcm.FcmClient) {
 
 	fmt.Println("Setting up Api Calls")
 	shittyMusicDao = *_dao

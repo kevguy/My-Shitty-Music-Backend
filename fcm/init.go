@@ -58,6 +58,30 @@ func (fcmClient *FcmClient) UnsubscribeFromBroadcastTopic(token string) {
 	fmt.Println(response.SuccessCount, "tokens were subscribed successfully")
 }
 
+func (fcmClient *FcmClient) BroadcastMessage(title string, body string) {
+	message := &messaging.Message{
+		Notification: &messaging.Notification{
+			Title: title,
+			Body:  body,
+		},
+		Webpush: &messaging.WebpushConfig{
+			Notification: &messaging.WebpushNotification{
+				Title: title,
+				Body:  body,
+				Icon:  "https://raw.githubusercontent.com/kevguy/My-Shitty-Music-Frontend/master/public/img/icons/icon-72x72.png",
+			},
+		},
+		Topic: "broadcast",
+	}
+
+	response, err := fcmClient.client.Send(fcmClient.ctx, message)
+	if err != nil {
+		log.Fatalln(err)
+	} else {
+		fmt.Println(response)
+	}
+}
+
 // BroadcastHello says Hello to everyone
 func (fcmClient *FcmClient) BroadcastHello() {
 	// oneHour := time.Duration(1) * time.Hour
@@ -67,13 +91,20 @@ func (fcmClient *FcmClient) BroadcastHello() {
 			Title: "Hello World",
 			Body:  "Just dropping by and say a fuckin hello",
 		},
-		Android: &messaging.AndroidConfig{
-			// TTL: &oneHour,
-			Notification: &messaging.AndroidNotification{
-				Icon:  "stock_ticker_update",
-				Color: "#f45342",
+		Webpush: &messaging.WebpushConfig{
+			Notification: &messaging.WebpushNotification{
+				Title: "Hello World",
+				Body:  "Just dropping by and say a fuckin hello",
+				Icon:  "https://raw.githubusercontent.com/kevguy/My-Shitty-Music-Frontend/master/public/img/icons/icon-72x72.png",
 			},
 		},
+		// Android: &messaging.AndroidConfig{
+		// 	TTL: &oneHour,
+		// 	Notification: &messaging.AndroidNotification{
+		// 		Icon:  "stock_ticker_update",
+		// 		Color: "#f45342",
+		// 	},
+		// },
 		// APNS: &messaging.APNSConfig{
 		// 	Payload: &messaging.APNSPayload{
 		// 		Aps: &messaging.Aps{

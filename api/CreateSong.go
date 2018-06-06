@@ -66,4 +66,6 @@ func CreateSongEndPoint(w http.ResponseWriter, r *http.Request, next http.Handle
 		Type:    "text",
 		Content: user.Name + " added a new song",
 	})
+
+	fcmClient.BroadcastMessage("A new song is added", song.Name+" is added")
 }
