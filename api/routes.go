@@ -28,6 +28,7 @@ func HandleAPI(r *mux.Router,
 	shittyMusicDao = *_dao
 	shittyMusicRedisDao = *_redisDao
 	authentication = *_authentication
+	fcmClient = *_fcmClient
 	fmt.Println(authentication)
 
 	r.HandleFunc("/songs/plays", GetSongsPlaysEndPoint).Methods("GET")

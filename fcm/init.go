@@ -59,6 +59,7 @@ func (fcmClient *FcmClient) UnsubscribeFromBroadcastTopic(token string) {
 }
 
 func (fcmClient *FcmClient) BroadcastMessage(title string, body string) {
+	fmt.Println("BroadcastMessage")
 	message := &messaging.Message{
 		Notification: &messaging.Notification{
 			Title: title,
